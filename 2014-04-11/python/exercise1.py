@@ -87,9 +87,18 @@ sudT = T([1,2])([42.4,6.25])(sud)
 muro_dx = STRUCT([nordT,estT,sudT])
 VIEW(muro_dx)
 
+#Muro in mezzo
+m6 = PROD([CUBOID([6,0.25]), Q(8)])
+m6t = T([1,2])([37, 12.2])(m6)
+
+#Vetri-doppi
+vd = PROD([CUBOID([0.1,6.75]), Q(6)])
+vdt = T([1,2,3])([32,8.25,2])(vd)
+
+
 base_scala_vasca = DIFFERENCE([base_scala, T([1,2,3])([2,2,0.2])(vasca)])
 #VIEW(base_scala_vasca)
-lato_sin = STRUCT([muro_sx,base_scala,interno,vascaT,m3t,m4t,m5t,muro_dx])
+lato_sin = STRUCT([muro_sx,base_scala,interno,vascaT,m3t,m4t,m5t,muro_dx,m6t,vdt])
 VIEW(lato_sin)
 
 
