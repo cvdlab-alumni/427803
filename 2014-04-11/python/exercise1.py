@@ -35,9 +35,9 @@ base_scala = STRUCT([T([1,2])([37,2])(scala), base])
 v_muro_sx = [[1.75,1.75],[9,1.75],[1.75,2],[2,2],[9,2],[1.75,22.75],[2,22.75],[9.75,22.75],[1.75,23],[9.75,23]]
 f_muro_sx = [[0,1,4,3,2],[2,3,6,5],[5,6,7,9,8]]
 
-muro_sx_lat = PROD([CUBOID([0.25,6.25]), Q(8)])
+muro_sx_lat = PROD([CUBOID([0.25,5.5]), Q(8)])
 #VIEW(muro_sx_lat)
-muro_sx_lat = T([1,2])([9.75,16.75])(muro_sx_lat)
+muro_sx_lat = T([1,2])([9.75,17.5])(muro_sx_lat)
 #VIEW(muro_sx_lat)
 
 #muri interni
@@ -57,12 +57,39 @@ muro_sx = STRUCT([muro_sx_lat, muro_sx_parz])
 #Creo Vasca
 vasca = COLOR(BLUE)(PROD([CUBOID([20,9]), Q(1.8)]))
 vascaT= T([1,2,3])([2,2,0.2])(vasca)
-VIEW(vascaT)
+#VIEW(vascaT)
 
+#Creo Muro-Panca
+m3 = PROD([CUBOID([18.5,0.25]), Q(6)])
+m3t = T([1,2,3])([8.75,16,2])(m3)
+
+
+#Creo Muro-vasca
+m4 = PROD([CUBOID([9.7,0.25]), Q(6)])
+m4t = T([1,2,3])([26.2,8,2])(m4)
+
+#Creo Muro-panca
+m5 = PROD([CUBOID([10,0.1]), Q(6)])
+m5t = T([1,2,3])([30,15,2])(m5)
+
+#Creo Muro-dx
+nord = PROD([CUBOID([13.4,0.25]), Q(8)])
+nordT = T([1,2])([39,17])(nord)
+VIEW(nordT)
+
+
+est = PROD([CUBOID([0.25,11]), Q(8)])
+estT = T([1,2])([52.375,6.25])(est)
+
+sud = PROD([CUBOID([10,0.25]), Q(8)])
+sudT = T([1,2])([42.4,6.25])(sud)
+
+muro_dx = STRUCT([nordT,estT,sudT])
+VIEW(muro_dx)
 
 base_scala_vasca = DIFFERENCE([base_scala, T([1,2,3])([2,2,0.2])(vasca)])
-VIEW(base_scala_vasca)
-lato_sin = STRUCT([muro_sx,base_scala,interno,vascaT])
+#VIEW(base_scala_vasca)
+lato_sin = STRUCT([muro_sx,base_scala,interno,vascaT,m3t,m4t,m5t,muro_dx])
 VIEW(lato_sin)
 
 
