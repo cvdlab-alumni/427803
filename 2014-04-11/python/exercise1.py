@@ -94,11 +94,19 @@ m6t = T([1,2])([37, 12.2])(m6)
 #Vetri-doppi
 vd = PROD([CUBOID([0.1,6.75]), Q(6)])
 vdt = T([1,2,3])([32,8.25,2])(vd)
+vdt2 = T([1,2,3])([33,8.25,2])(vd)
 
+#Copertura sx
+c_sx = PROD([CUBOID([9,11]), Q(0.5)])
+c_sxt = T([1,2,3])([1,14,8])(c_sx)
+
+#Copertura dx
+c_dx = PROD([CUBOID([23,13]), Q(0.5)])
+c_dxt = T([1,2,3])([25,5,8])(c_dx)
 
 base_scala_vasca = DIFFERENCE([base_scala, T([1,2,3])([2,2,0.2])(vasca)])
 #VIEW(base_scala_vasca)
-lato_sin = STRUCT([muro_sx,base_scala,interno,vascaT,m3t,m4t,m5t,muro_dx,m6t,vdt])
+lato_sin = STRUCT([muro_sx,base_scala,interno,vascaT,m3t,m4t,m5t,muro_dx,m6t,vdt,vdt2,c_sxt,c_dxt])
 VIEW(lato_sin)
 
 
