@@ -18,7 +18,6 @@ base_scala = PROD([STRUCT(MKPOLS((pol_base_scala,f_baseScala))), Q(2)])
 
 base = DIFFERENCE([base_grezza, base_scala ])
 #VIEW(base)
-gradino = CUBOID([0.42,3,0.14])
 
 v_scale = [[0,0],[3,0],[0,0.25],[2.625,0.25],[3,0.25],[0,0.5],[2.25,0.5],[2.625,0.5],[0,0.75],[1.875,0.75],[2.25,0.75],[0,1],[1.5,1],[1.875,1],[0,1.25],[1.125,1.25],[1.5,1.25],[0,1.5],[0.75,1.5],[1.125,1.5],[0,1.75],[0.375,1.75],[0.75,1.75],[0,2],[0.375,2]]
 #f_scale = [[0,1,4,3,2],[2,3,6,5,4],[4,5,8,7,6],[6,7,10,9,8],[8,9,12,11,10],[10,11,14,13,12],[12,13,16,15,14],[14,15,18,17]]
@@ -29,19 +28,43 @@ scala = T(2)(3)(R([2,3])(PI/2)(scala_grezza))
 
 base_scala = STRUCT([T([1,2])([37,2])(scala), base])
 
-#VIEW(gradino)
 #VIEW(scala)
-VIEW(base_scala)
+#VIEW(base_scala)
 
 #Creo muro sinistro
 v_muro_sx = [[1.75,1.75],[9,1.75],[1.75,2],[2,2],[9,2],[1.75,22.75],[2,22.75],[9.75,22.75],[1.75,23],[9.75,23]]
 f_muro_sx = [[0,1,4,3,2],[2,3,6,5],[5,6,7,9,8]]
 
+muro_sx_lat = PROD([CUBOID([0.25,6.25]), Q(8)])
+#VIEW(muro_sx_lat)
+muro_sx_lat = T([1,2])([9.75,16.75])(muro_sx_lat)
+#VIEW(muro_sx_lat)
 
-muro_sx = PROD([STRUCT(MKPOLS((v_muro_sx,f_muro_sx))), Q(8)])
-VIEW(muro_sx)
+#muri interni
+m1 = PROD([CUBOID([7.75,0.1]), Q(8)])
+#VIEW(m1)
+m2 = PROD([CUBOID([0.1,4.9]), Q(8)])
+#VIEW(m2)
+interno = STRUCT([T([1,2])([2,18])(m1),T([1,2])([6,18.1])(m2)])
+#VIEW(interno)
 
-lato_sin = STRUCT([muro_sx,base_scala])
+muro_sx_parz = PROD([STRUCT(MKPOLS((v_muro_sx,f_muro_sx))), Q(8)])
+#VIEW(muro_sx_parz)
+
+muro_sx = STRUCT([muro_sx_lat, muro_sx_parz])
+#VIEW(muro_sx)
+
+#Creo Vasca
+vasca = COLOR(BLUE)(PROD([CUBOID([20,9]), Q(1.8)]))
+vascaT= T([1,2,3])([2,2,0.2])(vasca)
+VIEW(vascaT)
+
+
+base_scala_vasca = DIFFERENCE([base_scala, T([1,2,3])([2,2,0.2])(vasca)])
+VIEW(base_scala_vasca)
+lato_sin = STRUCT([muro_sx,base_scala,interno,vascaT])
 VIEW(lato_sin)
+
+
 
 
