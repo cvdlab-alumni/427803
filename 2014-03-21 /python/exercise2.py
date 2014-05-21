@@ -170,5 +170,5 @@ base_scala_vasca_doppia = DIFFERENCE([base_scala_vasca, T([1,2,3])([48,5.75,0.2]
 base_scala_vasca_color = COLOR(GRAY)(base_scala_vasca)
 base_scala_vasca_doppia_color = COLOR([0.95,0.90,0.87])(base_scala_vasca_doppia)
 padiglione = STRUCT([muro_sx,base_scala_vasca_doppia_color,interno,vascaT,vasca2T,mPt,mVt,m5t,muro_dx,m6t,vdt,vdt2,tetto,c_sxt,panca_t,vSxT,vDxT, cilindri])
-VIEW(padiglione)
+VIEW(SKELETON(1)(padiglione))
 
