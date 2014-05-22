@@ -1,3 +1,5 @@
+
+
 from larcc import *
 from pyplasm import *
 #Scrivo i vertici della pianta base
@@ -39,6 +41,45 @@ muro_sx_lat = PROD([CUBOID([0.25,5.5]), Q(6)])
 #VIEW(muro_sx_lat)
 muro_sx_lat = T([1,2])([9.75,17.5])(muro_sx_lat)
 #VIEW(muro_sx_lat)
+
+#muri interni
+m1 = PROD([CUBOID([7.75,0.1]), Q(4)])
+
+#Creo Muro-Panca
+mP = PROD([CUBOID([18.5,0.25]), Q(4)])
+mPt = COLOR([0.95,0.90,0.87])(T([1,2,3])([8.75,16,2])(mP))
+#Creo Muro-vasca
+mV = PROD([CUBOID([9.7,0.25]), Q(4)])
+mVt = COLOR([0.15,0.20,0.20])(T([1,2,3])([26.2,8,2])(mV))
+
+#Creo Muro-panca
+m5 = PROD([CUBOID([10,0.1]), Q(4)])
+m5t = COLOR([0.4,0.4,0.4])(SKELETON(1)(T([1,2,3])([30,15,2])(m5)))
+
+#Creo Panca
+panca = T(3)(0.7)(PROD([CUBOID([15.599,0.8]), Q(0.1)]))
+pil = PROD([CUBOID([0.35,0.8]), Q(0.7)])
+pil_fila = STRUCT([pil, T(1)(2.178)]*8) 
+panca = STRUCT([panca,pil_fila])
+panca_t = COLOR([0.9,0.9,0.9])(T([1,2,3])([9.1,15.1,2])(panca))
+#VIEW(panca)
+
+#porte
+p1 = COLOR(GRAY)(T([1,2,3])([8,18,2])(PROD([CUBOID([1,0.1]), Q(4)])))
+p2 = COLOR(GRAY)(T([1,2,3])([6,20,2])(PROD([CUBOID([0.1,1]), Q(4)])))
+p3 = COLOR(GRAY)(T([1,2,3])([7,21.8,2])(PROD([CUBOID([0.9,0.1]), Q(4)])))
+p4 = COLOR(GRAY)(T([1,2,3])([8,22,2])(PROD([CUBOID([0.1, 0.7]), Q(4)])))
+
+m2 = PROD([CUBOID([0.1,4.9]), Q(4)])
+m3 = T([1,2,3])([6.1,21.8,2])(PROD([CUBOID([3.65,0.1]), Q(4)]))
+m4 = T([1,2,3])([8,21.8,2])(PROD([CUBOID([0.1,1.2]), Q(4)]))
+
+#VIEW(m2)
+m1_porta = DIFFERENCE([T([1,2,3])([2,18,2])(m1),p1])
+m2_porta = DIFFERENCE([T([1,2,3])([6,18.1,2])(m2),p2])
+m3_porta = DIFFERENCE([m3,p3])
+m4_porta = DIFFERENCE([m4,p4])
+interno = COLOR([0.4,0.4,0.4])(SKELETON(1)(STRUCT([m1_porta,m2_porta,m3_porta,m4_porta])))
 
 
 muro_sx_parz = PROD([STRUCT(MKPOLS((v_muro_sx,f_muro_sx))), Q(6)])
@@ -112,7 +153,13 @@ apertura = T([1,2,3])([33,10,6])(PROD([CUBOID([1,3]), Q(0.5)]))
 #VIEW(apertura)
 c_dxt = DIFFERENCE([c_dxt,apertura])
 #VIEW(c_dxt)
+c_dxEsterna = PROD([CUBOID([23.2,13.2]), Q(0.1)])
 
+c_dxtEsterna = T([1,2,3])([24.9,4.9,6.4])(c_dxEsterna)
+
+c_dxt = DIFFERENCE([c_dxt,apertura])
+c_dxtEsterna = DIFFERENCE([c_dxtEsterna,apertura])
+tetto = STRUCT([c_dxt,COLOR([0.3,0.3,0.3])(c_dxtEsterna)])
 
 
 
@@ -121,9 +168,8 @@ base_scala_vasca_doppia = DIFFERENCE([base_scala_vasca, T([1,2,3])([48,5.75,0.2]
 
 base_scala_vasca_color = COLOR(GRAY)(base_scala_vasca)
 base_scala_vasca_doppia_color = COLOR([0.95,0.90,0.87])(base_scala_vasca_doppia)
-padiglione = STRUCT([muro_sx,base_scala_vasca_doppia_color,vascaT,vasca2T,muro_dx,m6t,m5t,c_dxt,c_sxt, vdt,vdt2, vDxT, vSxT])
+padiglione = STRUCT([muro_sx,base_scala_vasca_doppia_color,interno,vascaT,mPt,mVt,vasca2T,muro_dx,m6t,m5t,c_dxt,c_sxt,tetto,c_sxt,panca_t, vdt,vdt2, vDxT, vSxT])
 VIEW(padiglione)
-
 
 
 

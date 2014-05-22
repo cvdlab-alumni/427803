@@ -118,25 +118,7 @@ muro_dx = COLOR([0.15,0.22,0.2])(T([1,2])([-0.5,-0.5])(muro_dx))
 m6 = PROD([CUBOID([6,0.25]), Q(6)])
 m6t = COLOR([0.9,0.60,0.30])(T([1,2])([37, 12.2])(m6))
 
-#Vetri-doppi
-vd0 = PROD([CUBOID([0.1,3.375]), Q(4)])
-vd1 = PROD([CUBOID([0.1,3.375]), Q(4)])
-vd = STRUCT([vd0,T(2)(3.375)(vd1)])
 
-vdt = COLOR([0.4,0.4,0.4])(SKELETON(1)(T([1,2,3])([32,8.25,2])(vd)))
-vdt2 = COLOR([0.4,0.4,0.4])(SKELETON(1)(T([1,2,3])([33,8.25,2])(vd)))
-
-#Vetri Sx
-vS0 = PROD([CUBOID([3.68,0.1]), Q(4)])
-vSx = STRUCT([vS0, T(1)(3.68)] * 3)
-vSxT = COLOR([0.4,0.4,0.4])(SKELETON(1)(T([1,2,3])([31,6,2])(vSx)))
-
-#VIEW(vSx)
-
-#Vetri Dx
-vD0 = PROD([CUBOID([0.1,0.9]), Q(4)])
-vDx = STRUCT([vD0, T(2)(0.9)] * 8)
-vDxT = COLOR([0.4,0.4,0.4])(SKELETON(1)(T([1,2,3])([45.8,8,2])(vDx)))
 
 
 #Copertura sx
@@ -158,17 +140,13 @@ c_dxtEsterna = DIFFERENCE([c_dxtEsterna,apertura])
 tetto = STRUCT([c_dxt,COLOR([0.3,0.3,0.3])(c_dxtEsterna)])
 
 
-#Cilindri
-cil = CYLINDER([0.1,4.0])(240)
-fila_cil1 = STRUCT([cil, T(1)(6)] * 4)
-fila_cil1 = T([1,2,3])([27,7.8,2])(fila_cil1)
-cilindri = COLOR([0.4,0.4,0.4])(STRUCT([fila_cil1, T(2)(7.6)]*2))
+
 
 base_scala_vasca = DIFFERENCE([base_scala, T([1,2,3])([2,2,0.2])(vasca)])
 base_scala_vasca_doppia = DIFFERENCE([base_scala_vasca, T([1,2,3])([48,5.75,0.2])(vasca2)])
 
 base_scala_vasca_color = COLOR(GRAY)(base_scala_vasca)
 base_scala_vasca_doppia_color = COLOR([0.95,0.90,0.87])(base_scala_vasca_doppia)
-padiglione = STRUCT([muro_sx,base_scala_vasca_doppia_color,interno,vascaT,vasca2T,mPt,mVt,m5t,muro_dx,m6t,vdt,vdt2,tetto,c_sxt,panca_t,vSxT,vDxT, cilindri])
+padiglione = STRUCT([muro_sx,base_scala_vasca_doppia_color,interno,vascaT,vasca2T,mPt,mVt,m5t,muro_dx,m6t, tetto,c_sxt,panca_t])
 VIEW(padiglione)
 
