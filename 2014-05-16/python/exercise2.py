@@ -1,174 +1,280 @@
-from larcc import *
 from pyplasm import *
+import os,sys
+sys.path.insert(0, '/Users/toucherjay/Desktop/lar-cc/lib/py')
+from larcc import *
+from sysml import *
+from splines import *
+from exercise1 import *
+
+GRID = COMP([INSR(PROD),AA(QUOTE)])
+
+#giardino
+controlpoints = [[0, 2.3], [0.3, 5.00], [5.19, 5], [5.38, 2.43]]
+dom = larDomain([3])
+mapping = larBezierCurve(controlpoints)
+obj = larMap(mapping)(dom)
+garden = STRUCT(MKPOLS(obj))
+garden = STRUCT([garden,POLYLINE([[0,3.3],[0,0],[8.4,0]])])
+garden3D = DIFFERENCE([PROD([SOLIDIFY(garden),Q(0.3)]),CUBOID([8.4,.1,.3])])
+#VIEW (SOLIDIFY(garden),Q(0.3))
+#recinto
+controlpoints = [[1, 3.45], [1.78, 5.05], [4.02, 5.05], [4.82, 3.6]]
+dom = larDomain([64])
+mapping = larBezierCurve(controlpoints)
+obj = larMap(mapping)(dom)
+fence = STRUCT(MKPOLS(obj))
+fence = STRUCT([fence,POLYLINE([[.01,3.4],[0,0],[8.51,.1]])])
+fence3D = PROD([SOLIDIFY(fence),Q(1)])
+fence3D = DIFFERENCE([fence3D,PROD([SOLIDIFY(garden),Q(1)])])
+garden3D = COLOR([0.012,0.753,0.234])(garden3D)
+
+out = T([1,2])([4.5,7.6])(STRUCT([garden3D,fence3D]))
 
 
-#Scrivo i vertici della pianta base
-V =[[1,1],[40,1],[40,5],[1,5],[53,5],[1,18],[6,18],[11,18],[53,18],[1,24],[6,24],[11,24]]
 
-#Scrivo le celle della pianta base
-FV = [[0,1,3,2],[2,3,4,8,7,6,5],[5,6,10,9],[6,7,11,10]]
-
-base_grezza = PROD([STRUCT(MKPOLS((V,FV))), Q(2)])
-
-#VIEW(base_grezza)
-
-#Creo la scala
-pol_base_scala = [[37,2],[40,2],[37,5],[40,5]]
-f_baseScala = [[0,1,3,2]]
-base_scala = PROD([STRUCT(MKPOLS((pol_base_scala,f_baseScala))), Q(2)])
-#VIEW(base_scala)
-
-base = DIFFERENCE([base_grezza, base_scala ])
-#VIEW(base)
-
-v_scale = [[0,0],[3,0],[0,0.25],[2.625,0.25],[3,0.25],[0,0.5],[2.25,0.5],[2.625,0.5],[0,0.75],[1.875,0.75],[2.25,0.75],[0,1],[1.5,1],[1.875,1],[0,1.25],[1.125,1.25],[1.5,1.25],[0,1.5],[0.75,1.5],[1.125,1.5],[0,1.75],[0.375,1.75],[0.75,1.75],[0,2],[0.375,2]]
-#f_scale = [[0,1,4,3,2],[2,3,6,5,4],[4,5,8,7,6],[6,7,10,9,8],[8,9,12,11,10],[10,11,14,13,12],[12,13,16,15,14],[14,15,18,17]]
-f_scale = [[0,1,4,3,2],[2,3,7,6,5],[5,6,10,9,8],[8,9,13,12,11],[11,12,16,15,14],[14,15,19,18,17],[17,18,22,21,20],[20,21,24,23]]
-scala_grezza = PROD([STRUCT(MKPOLS((v_scale,f_scale))), Q(3)])
-
-scala = T(2)(3)(R([2,3])(PI/2)(scala_grezza))
-
-base_scala = STRUCT([T([1,2])([37,2])(scala), base])
-
-#VIEW(scala)
-#VIEW(base_scala)
-
-#Creo muro sinistro
-v_muro_sx = [[1.75,1.75],[9,1.75],[1.75,2],[2,2],[9,2],[1.75,22.75],[2,22.75],[9.75,22.75],[1.75,23],[9.75,23]]
-f_muro_sx = [[0,1,4,3,2],[2,3,6,5],[5,6,7,9,8]]
-
-muro_sx_lat = PROD([CUBOID([0.25,5.5]), Q(6)])
-#VIEW(muro_sx_lat)
-muro_sx_lat = T([1,2])([9.75,17.5])(muro_sx_lat)
-#VIEW(muro_sx_lat)
-
-#muri interni
-m1 = PROD([CUBOID([7.75,0.1]), Q(4)])
-
-#porte
-p1 = COLOR(GRAY)(T([1,2,3])([8,18,2])(PROD([CUBOID([1,0.1]), Q(4)])))
-p2 = COLOR(GRAY)(T([1,2,3])([6,20,2])(PROD([CUBOID([0.1,1]), Q(4)])))
-p3 = COLOR(GRAY)(T([1,2,3])([7,21.8,2])(PROD([CUBOID([0.9,0.1]), Q(4)])))
-p4 = COLOR(GRAY)(T([1,2,3])([8,22,2])(PROD([CUBOID([0.1, 0.7]), Q(4)])))
-
-m2 = PROD([CUBOID([0.1,4.9]), Q(4)])
-m3 = T([1,2,3])([6.1,21.8,2])(PROD([CUBOID([3.65,0.1]), Q(4)]))
-m4 = T([1,2,3])([8,21.8,2])(PROD([CUBOID([0.1,1.2]), Q(4)]))
-
-#VIEW(m2)
-m1_porta = DIFFERENCE([T([1,2,3])([2,18,2])(m1),p1])
-m2_porta = DIFFERENCE([T([1,2,3])([6,18.1,2])(m2),p2])
-m3_porta = DIFFERENCE([m3,p3])
-m4_porta = DIFFERENCE([m4,p4])
-interno = COLOR([0.4,0.4,0.4])(SKELETON(1)(STRUCT([m1_porta,m2_porta,m3_porta,m4_porta])))
-
-#VIEW(interno)
-
-muro_sx_parz = PROD([STRUCT(MKPOLS((v_muro_sx,f_muro_sx))), Q(6)])
-#VIEW(muro_sx_parz)
-
-muro_sx = COLOR([0.95,0.90,0.87])(STRUCT([muro_sx_lat, muro_sx_parz]))
-#VIEW(muro_sx)
-
-#Creo Vasche
-vasca = COLOR([0,0.85,0.95])(PROD([CUBOID([20,9]), Q(1.8)]))
-vascaT= SCALE(3)(0.9)(T([1,2,3])([2,2,0.2])(vasca))
-vasca2 = COLOR([0,0.85,0.95])(PROD([CUBOID([4,11]), Q(1.8)]))
-vasca2T= SCALE(3)(0.9)(T([1,2,3])([48,5.75,0.2])(vasca2))
-
-#VIEW(vascaT)
-
-#Creo Muro-Panca
-mP = PROD([CUBOID([18.5,0.25]), Q(4)])
-mPt = COLOR([0.95,0.90,0.87])(T([1,2,3])([8.75,16,2])(mP))
+#ALTRI PIANI
 
 
-#Creo Muro-vasca
-mV = PROD([CUBOID([9.7,0.25]), Q(4)])
-mVt = COLOR([0.15,0.20,0.20])(T([1,2,3])([26.2,8,2])(mV))
+DRAW = COMP([VIEW,STRUCT,MKPOLS])
 
-#Creo Muro-panca
-m5 = PROD([CUBOID([10,0.1]), Q(4)])
-m5t = COLOR([0.4,0.4,0.4])(SKELETON(1)(T([1,2,3])([30,15,2])(m5)))
+#appartamento
 
-#Creo Panca
-panca = T(3)(0.7)(PROD([CUBOID([15.599,0.8]), Q(0.1)]))
-pil = PROD([CUBOID([0.35,0.8]), Q(0.7)])
-pil_fila = STRUCT([pil, T(1)(2.178)]*8) 
-panca = STRUCT([panca,pil_fila])
-panca_t = COLOR([0.9,0.9,0.9])(T([1,2,3])([9.1,15.1,2])(panca))
-#VIEW(panca)
+master = assemblyDiagramInit([7,15,2])([[.3,2,.3,4,.3,1.5,.05],[.3,1,0.3,0.2,.05,3,.1,2,.1,.4,.05,1.3,.1,3,.3],[.3,2.7]])
+V,CV = master
+hpc = SKEL_1(STRUCT(MKPOLS(master)))
 
-#Creo Muro-dx
-nord = PROD([CUBOID([13.4,0.25]), Q(6)])
-nordT = T([1,2])([39,17])(nord)
-#VIEW(nordT)
+#in cyan i numeri delle celle
+casa = cellNumbering (master,hpc)(range(len(CV)),CYAN,1)
+#VIEW(casa)
 
+#RIMOZIONE CELLE
+remove = [0,1,2,3,30,31,32,33,150,151,152,153,180,181,182,183,154,155,184,185,156,157,186,187,178,179,176,177,174,175,172,173,203,202,204,205,206,207,208,209]
 
-est = PROD([CUBOID([0.25,11]), Q(6)])
-estT = T([1,2])([52.375,6.25])(est)
+#cubicroom
+roomsToRemove = [37,41,45,49,53,57,93,97,101,105,109,113,117,161,163,165,167,169]
 
-sud = PROD([CUBOID([10,0.25]), Q(6)])
-sudT = T([1,2])([42.4,6.25])(sud)
+#pareti
+wallsToRemove = [39,43,47,51,55,69,67,71,95,99,111]
+#pavimenti
+#floorsToRemove = [130,152,174,196,218,128,216,150,172,194,238,240]
 
-muro_dx = STRUCT([nordT,estT,sudT])
-muro_dx = COLOR([0.15,0.22,0.2])(T([1,2])([-0.5,-0.5])(muro_dx))
-
-#Muro in mezzo
-m6 = PROD([CUBOID([6,0.25]), Q(6)])
-m6t = COLOR([0.9,0.60,0.30])(T([1,2])([37, 12.2])(m6))
-
-#Vetri-doppi
-vd0 = PROD([CUBOID([0.1,3.375]), Q(4)])
-vd1 = PROD([CUBOID([0.1,3.375]), Q(4)])
-vd = STRUCT([vd0,T(2)(3.375)(vd1)])
-
-vdt = COLOR([0.4,0.4,0.4])(SKELETON(1)(T([1,2,3])([32,8.25,2])(vd)))
-vdt2 = COLOR([0.4,0.4,0.4])(SKELETON(1)(T([1,2,3])([33,8.25,2])(vd)))
-
-#Vetri Sx
-vS0 = PROD([CUBOID([3.68,0.1]), Q(4)])
-vSx = STRUCT([vS0, T(1)(3.68)] * 3)
-vSxT = COLOR([0.4,0.4,0.4])(SKELETON(1)(T([1,2,3])([31,6,2])(vSx)))
-
-#VIEW(vSx)
-
-#Vetri Dx
-vD0 = PROD([CUBOID([0.1,0.9]), Q(4)])
-vDx = STRUCT([vD0, T(2)(0.9)] * 8)
-vDxT = COLOR([0.4,0.4,0.4])(SKELETON(1)(T([1,2,3])([45.8,8,2])(vDx)))
+toRemove = roomsToRemove + wallsToRemove + remove 
 
 
-#Copertura sx
-c_sx = PROD([CUBOID([9,11]), Q(0.5)])
-c_sxt = COLOR(WHITE)(T([1,2,3])([1,14,6])(c_sx))
+#in CV di master inserisco solo le celle NON da rimuovere
+master = V,[cell for k,cell in enumerate(CV) if not (k in toRemove)]
+DRAW(master)
 
-#Copertura dx
-c_dx = PROD([CUBOID([23,13]), Q(0.4)])
-c_dxEsterna = COLOR([0.3,0.3,0.3])(PROD([CUBOID([23.2,13.2]), Q(0.1)]))
-#VIEW(c_dxEsterna)
-
-c_dxt = COLOR(WHITE)(T([1,2,3])([25,5,6])(c_dx))
-c_dxtEsterna = T([1,2,3])([24.9,4.9,6.4])(c_dxEsterna)
-
-apertura = T([1,2,3])([33,10,6])(PROD([CUBOID([1,3]), Q(0.5)]))
-#VIEW(apertura)
-c_dxt = DIFFERENCE([c_dxt,apertura])
-c_dxtEsterna = DIFFERENCE([c_dxtEsterna,apertura])
-#VIEW(STRUCT([c_dxt,c_dxtEsterna]))
+hpc = SKEL_1(STRUCT(MKPOLS(master)))
+hpc = cellNumbering (master,hpc)(range(len(master[1])),RED,1)
+#VIEW(hpc)
 
 
-#Cilindri
-cil = CYLINDER([0.1,4.0])(240)
-fila_cil1 = STRUCT([cil, T(1)(6)] * 4)
-fila_cil1 = T([1,2,3])([27,7.8,2])(fila_cil1)
-cilindri = COLOR([0.4,0.4,0.4])(STRUCT([fila_cil1, T(2)(7.6)]*2))
+#CREAZIONE PORTE E FINESTRE NELLE PARETI
+#porta d'entrata (cella 27)
+diagram = assemblyDiagramInit([2,1,2])([[1.7,.3],[.3],[2.2,.5]])
+master = diagram2cell(diagram,master,27)
 
-base_scala_vasca = DIFFERENCE([base_scala, T([1,2,3])([2,2,0.2])(vasca)])
-base_scala_vasca_doppia = DIFFERENCE([base_scala_vasca, T([1,2,3])([48,5.75,0.2])(vasca2)])
+hpc = SKEL_1(STRUCT(MKPOLS(master)))
+hpc = cellNumbering (master,hpc)(range(len(master[1])),RED,1)
+#VIEW(hpc)
 
-base_scala_vasca_color = COLOR(GRAY)(base_scala_vasca)
-base_scala_vasca_doppia_color = COLOR([0.95,0.90,0.87])(base_scala_vasca_doppia)
-padiglione = STRUCT([muro_sx,base_scala_vasca_doppia_color,interno,vascaT,vasca2T,mPt,mVt,m5t,muro_dx,m6t,vdt,vdt2,c_dxt, c_dxtEsterna,c_sxt,panca_t,vSxT,vDxT, cilindri])
-VIEW(padiglione)
+#porta camera (cella 53)
+diagram = assemblyDiagramInit([1,3,2])([[.3],[.5,1,.5],[2.2,.5]])
+#diagram = assemblyDiagramInit([1,1,2])([[.3],[1],[2.2,.5]])
+master = diagram2cell(diagram,master,52)
 
+
+#VIEW(hpc)
+#porta bagno (cella 61)
+diagram = assemblyDiagramInit([1,3,2])([[.3],[.15,.7,.15],[2.2,.5]])
+master = diagram2cell(diagram,master,59)
+
+#VIEW(hpc)
+#porta camera-letto (cella 65)
+diagram = assemblyDiagramInit([1,3,2])([[.3],[1,1,1],[2.2,.5]])
+master = diagram2cell(diagram,master,62)
+
+#VIEW(hpc)
+
+#finestra soggiorno/balcone (cella 99)
+diagram = assemblyDiagramInit([1,3,2])([[.3],[.8,1.4,.8],[2.2,.5]])
+master = diagram2cell(diagram,master,95)
+
+#VIEW(hpc)
+
+#finestra camera/balcone (cella 103)
+diagram = assemblyDiagramInit([1,3,2])([[.3],[.65,.7,.65],[2.2,.5]])
+master = diagram2cell(diagram,master,98)
+
+#VIEW(hpc)
+#finestra1 bagno (cella 111)
+diagram = assemblyDiagramInit([1,3,3])([[.3],[.625,.7,.625],[1,1.4,.3]])
+master = diagram2cell(diagram,master,105)
+
+
+#VIEW(hpc)
+#finestra2 camera (cella 115)
+diagram = assemblyDiagramInit([1,3,3])([[.3],[.8,1.4,.8],[1,1.4,.3]])
+master = diagram2cell(diagram,master,108)
+
+hpc = SKEL_1(STRUCT(MKPOLS(master)))
+hpc = cellNumbering (master,hpc)(range(len(master[1])),RED,1)
+#VIEW(hpc)
+
+
+
+#balcone
+
+#RIMOZIONE PORTE E FINESTRE
+porte = [133,139,145,151]
+finestre = [180,171]
+balconi = [163, 157]
+balcone = [110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132]
+toRemove2 = porte + finestre + balconi + balcone
+master0 = master[0], [cell for k,cell in enumerate(master[1]) if not (k in toRemove2)]
+DRAW(master0)
+
+floor0 = STRUCT(MKPOLS(master0))
+floor1 = T(3)(3)(STRUCT(MKPOLS(masterF)))
+floor2 = T(3)(3)(floor1)
+floor3 = T(3)(3)(floor2)
+floor4 = T(3)(3)(floor3)
+#tetto = COLOR([0.545,0.27,0])(T([1,3])([-1,15])(CUBOID([14,11,.3])))
+alaE = STRUCT([floor0,floor1,floor2,floor3,floor4])
+VIEW(alaE)
+alaO = T(1)(0)(R([2,2])(3/2*(PI))(alaE))
+ala1 = STRUCT([alaO,alaE])
+ala2 = R([1,2])(PI)(ala1)
+portone = T(2)(-1)(CUBOID([8.45,2,2.7]))
+pianerottolo = COLOR([0.9,0.85,0.1])(T([1,2])([-5,-1.5])(CUBOID([15,3,.3])))
+muro_androne = CUBOID([4.3,0.3,3])
+m_andr_sx = T([1,2])([2.6,-1.5])(muro_androne)
+m_andr_dx = T([1,2])([2.6,1.2])(muro_androne)
+palazzo = STRUCT([ala1,ala2])
+ala_scale = T([1,2])([-6.9,-1.3])(CUBOID([.3,2.6,15]))
+
+palazzo_ingresso = DIFFERENCE([palazzo,portone])
+palazzo_scale = DIFFERENCE([palazzo_ingresso,ala_scale])
+VIEW(palazzo_scale)
+
+
+#SCALE
+DRAW = COMP([VIEW,STRUCT,MKPOLS])
+master_scale = assemblyDiagramInit([2,1,2])([[.3,6.3],[2.6],[.3,2.7]])
+V,CV = master_scale
+hpc = SKEL_1(STRUCT(MKPOLS(master_scale)))
+hpc = cellNumbering (master_scale,hpc)(range(len(master_scale[1])),RED,1)
+VIEW(hpc)
+
+toRemoveScale = [3]
+master_scale = master_scale[0], [cell for k,cell in enumerate(master_scale[1]) if not (k in toRemoveScale)]
+
+#Finestre scale
+diagram = assemblyDiagramInit([1,3,3])([[.3],[.6,1.4,.6],[1,1.4,.3]])
+master_scale = diagram2cell(diagram,master_scale,1)
+
+hpc = SKEL_1(STRUCT(MKPOLS(master_scale)))
+hpc = cellNumbering (master_scale,hpc)(range(len(master_scale[1])),RED,1)
+VIEW(hpc)
+
+#Rimuove finestre
+removeFinestre = [6]
+master_scale = master_scale[0], [cell for k,cell in enumerate(master_scale[1]) if not (k in removeFinestre)]
+
+DRAW(master_scale)
+
+piano_scale = T([1,2])([-6.9,-1.3])(STRUCT(MKPOLS(master_scale)))
+pscale0 = T(3)(3)(piano_scale)
+pscale1 = T(3)(3)(pscale0)
+pscale2 = T(3)(3)(pscale1)
+pscale3 = T(3)(3)(pscale2)
+
+scale = STRUCT([piano_scale,pscale0,pscale1,pscale2,pscale3])
+
+VIEW(STRUCT([palazzo_ingresso,pianerottolo,m_andr_dx,m_andr_sx,scale]))
+
+
+
+#pianerottolo
+muro_di_fondo = T([1,2,3])([-2,7,.3])(CUBOID([2,-.3,2.7]))
+stair2D = SOLIDIFY(POLYLINE([[0,-3],[-2,-3],[-2,-2],[-3,-2],[-3,0],[-2,0],[-2,7],[0,7],[0,-3]]))
+stair3D = PROD([stair2D,Q(.3)])
+stairTerra = PROD([SOLIDIFY(POLYLINE([[0,-2],[-3,-2],[-3,0],[-2,0],[-2,7],[0,7],[0,-2]])),Q(.3)])
+rampaBase = PROD([SOLIDIFY(POLYLINE([[0,0],[.3,0],[0,1.5],[0,0]])),Q(2)])
+rampaTerra = T([1,2])([-2,-2])(S(2)(-1)(MAP([S3,S2,S1])(rampaBase)))
+ringhiera = GRID([[.05],[.05,-.05,.05,-.05,.05,-.05,.05,-.05,.05,-.05,.05,-.05,.05,-.05,.05,-.05,.05,-.05,.05,-.1,.05,-.05,.05,-.05,.05,-.05,.05,-.05,.05,-.05,.05,-.05,.05,-.05,.05,-.05,.05,-.05,.05],[1]])
+passamano = GRID([[.05],[2],[-1,.05]])
+supporto = STRUCT([ringhiera,passamano])
+pianerottoloTerra = STRUCT([stairTerra,rampaTerra,muro_di_fondo,COLOR(BLACK)(T([1,2,3])([-3,-2,.3])(supporto))])
+pianerottoloSuperiore = STRUCT([stair3D,muro_di_fondo,COLOR(BLACK)(T([1,2,3])([-3,-2,.3])(supporto)),COLOR(BLACK)(T([1,2,3])([-2,-3,.3])(MAP([S2,S1,S3])(supporto)))])
+pianerottoli = STRUCT([pianerottoloTerra,T(3)(3)(pianerottoloSuperiore),T(3)(6)(pianerottoloSuperiore)])
+
+#palazzina intera
+#floor1 = T(3)(3)(STRUCT(MKPOLS(master1)))
+#floor2 = T(3)(3)(floor1)
+#roof = COLOR([0.545,0.27,0])(T([1,3])([-1,9])(CUBOID([14,11,.3])))
+#ala1 = STRUCT([floor0,out,floor1,floor2,roof])
+#ala2 = S(2)(-1)(ala1)
+#ala3 = T(1)(-2)(S(1)(-1)(ala1))
+#place = COLOR([.4,.4,.4])(T(3)(-0.1)(CYLINDER([20,0.1])(72)))
+
+#elevatore
+#funzione che deopacizza un oggetto
+def trasparenza(oggetto):
+    return MATERIAL([1,1,1,0.1, 0,0,0.8,0.5, 1,1,1,0.1, 1,1,1,0.1, 100])(oggetto)
+
+floor = COLOR(GREEN)(T([1,2,3])([-5,-5,-.1])(CUBOID([10,10,.1])))
+g1 = T(3)(1)(MATERIAL([1,1,1,0.1, 0,0,0.8,0.5, 1,1,1,0.1, 1,1,1,0.1, 100])(floor))
+elevator1 = ((T([1,2])([-3,-3.5])(CUBOID([1,1.5,3.3]))))
+elevator2 = ((T([1,2,3])([-3,-3.5,3.3])(CUBOID([1,1.5,2.7]))))
+elevator3 = ((T([1,2,3])([-3,-3.5,6])(CUBOID([1,1.5,3]))))
+elevator1 = trasparenza(elevator1)
+elevator3 = trasparenza(elevator3)
+elevators = STRUCT([elevator1,elevator2,elevator3])
+
+#piscina
+WATERBLUE = [0.498,1,0.831]
+#prima curva
+controlpoints = [[0,0],[0,2*3],[-2*3,2*3],[-4*3,0],[0,-3*3]]
+dom = larDomain([64])
+mapping = larBezierCurve(controlpoints)
+obj = larMap(mapping)(dom)
+curva1 = STRUCT(MKPOLS(obj))
+cuore1 = STRUCT([curva1,S(1)(-1)(curva1)])
+#seconda curva
+controlpoints = [[0,-.1*3],[0,2*3],[-1.8*3,1.9*3],[-4*3,0],[0,-2.9*3]]
+dom = larDomain([64])
+mapping = larBezierCurve(controlpoints)
+obj = larMap(mapping)(dom)
+curva2 = STRUCT(MKPOLS(obj))
+cuore2 = STRUCT([curva2,S(1)(-1)(curva2)])
+#terza curva
+controlpoints = [[0,-.2*3],[0,2*3],[-1.6*3,1.8*3],[-4*3,0],[0,-2.8*3]]
+dom = larDomain([64])
+mapping = larBezierCurve(controlpoints)
+obj = larMap(mapping)(dom)
+curva3 = STRUCT(MKPOLS(obj))
+cuore3 = STRUCT([curva3,S(1)(-1)(curva3)])
+#quarta curva
+controlpoints = [[0,-.3*3],[0,2*3],[-1.4*3,1.7*3],[-4*3,0],[0,-2.7*3]]
+mapping = larBezierCurve(controlpoints)
+obj = larMap(mapping)(dom)
+curva4 = STRUCT(MKPOLS(obj))
+cuore4 = STRUCT([curva4,S(1)(-1)(curva4)])
+#strati della piscina
+esterno1 = PROD([SOLIDIFY(cuore1),Q(.4)])
+esterno2 = PROD([SOLIDIFY(cuore2),Q(.1)])
+esterno3 = PROD([SOLIDIFY(cuore3),Q(.1)])
+base = PROD([SOLIDIFY(cuore4),Q(.2)])
+acqua = PROD([SOLIDIFY(cuore4),Q(.1)])
+#assemblaggio piscina
+acqua = COLOR(WATERBLUE)(acqua)
+bordo = DIFFERENCE([esterno1,T(3)(.3)(esterno2),T(3)(.2)(esterno3),base])
+piscina = T([1,2])([-10,-8])(STRUCT([bordo,acqua]))
+
+
+palazzina = STRUCT([ala1,ala2,ala3,place,hill3D,elevators,pianerottoli,piscina])
+
+print("Loading... Please Wait")
+VIEW(palazzina)

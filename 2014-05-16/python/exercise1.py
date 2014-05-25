@@ -1,32 +1,33 @@
+from pyplasm import *
+import os,sys
+sys.path.insert(0, '/Users/toucherjay/Desktop/lar-cc/lib/py')
 from larcc import *
+from sysml import *
 
 DRAW = COMP([VIEW,STRUCT,MKPOLS])
 
-#casa torresina
-master = assemblyDiagramInit([11,11,2])([[.3,1,.1,3,.1,3,.1,1,.1,4,.3],[.3,1.5,.1,1.5,.1,1,.1,3,.1,3,.3],[.3,2.7]])
+#appartamento
+
+master = assemblyDiagramInit([7,15,2])([[.3,2,.3,4,.3,1.5,.05],[.3,1,0.3,0.2,.05,3,.1,2,.1,.4,.05,1.3,.1,3,.3],[.3,2.7]])
 V,CV = master
 hpc = SKEL_1(STRUCT(MKPOLS(master)))
 
-#in rosso i numeri delle celle
-casa = cellNumbering (master,hpc)(range(len(CV)),RED,1)
-VIEW(casa)
+#in cyan i numeri delle celle
+casa = cellNumbering (master,hpc)(range(len(CV)),CYAN,1)
+#VIEW(casa)
 
 #RIMOZIONE CELLE
-#stanze
-roomsToRemove = [25,29,33,37,41,
-                 69,73,77,81,85,
-                 113,117,121,125,129,
-                 157,161,165,169,173,
-                 201,205,209,213,217]
-#pareti
-wallsToRemove = [3,7,23,27,35,39,55,59,63,71,75,79,83,131,151,175,195,219,239,
-                 191,211,143,163,135,203]
-#colonne
-columnsToRemove = [1,5,57,61,153,197]
-#pavimenti
-floorsToRemove = [130,152,174,196,218,128,216,150,172,194,238,240]
+remove = [0,1,2,3,30,31,32,33,150,151,152,153,180,181,182,183,154,155,184,185,156,157,186,187,178,179,176,177,174,175,172,173,203,202,204,205,206,207,208,209]
 
-toRemove = roomsToRemove + wallsToRemove + columnsToRemove + floorsToRemove
+#cubicroom
+roomsToRemove = [37,41,45,49,53,57,93,97,101,105,109,113,117,161,163,165,167,169]
+
+#pareti
+wallsToRemove = [39,43,47,51,55,69,67,71,95,99,111]
+#pavimenti
+#floorsToRemove = [130,152,174,196,218,128,216,150,172,194,238,240]
+
+toRemove = roomsToRemove + wallsToRemove + remove 
 
 
 #in CV di master inserisco solo le celle NON da rimuovere
@@ -35,60 +36,89 @@ DRAW(master)
 
 hpc = SKEL_1(STRUCT(MKPOLS(master)))
 hpc = cellNumbering (master,hpc)(range(len(master[1])),RED,1)
-VIEW(hpc)
+#VIEW(hpc)
 
 
 #CREAZIONE PORTE E FINESTRE NELLE PARETI
-#porta d'entrata (cella 38)
-diagram = assemblyDiagramInit([1,2,2])([[.3],[1,.5],[2.2,.5]])
-master = diagram2cell(diagram,master,38)
-#porta soggiorno/giardino (cella 79)
-diagram = assemblyDiagramInit([1,3,2])([[.3],[1,1,1],[2.2,.5]])
-master = diagram2cell(diagram,master,79)
-#porta camera1/giardino (cella 94)
-diagram = assemblyDiagramInit([3,1,2])([[1,1,1],[.3],[2.2,.5]])
-master = diagram2cell(diagram,master,94)
-#porta camera2/giardino (cella 151)
-diagram = assemblyDiagramInit([3,1,2])([[1,1,2],[.3],[2.2,.5]])
-master = diagram2cell(diagram,master,151)
-#porta soggiorno/corridoio (cella 71)
-diagram = assemblyDiagramInit([1,3,2])([[.3],[.25,.5,.25],[2.2,.5]])
-master = diagram2cell(diagram,master,71)
-#porta corridoio/camera1 (cella 90)
-diagram = assemblyDiagramInit([3,1,2])([[1.25,.5,1.25],[.3],[2.2,.5]])
-master = diagram2cell(diagram,master,90)
-#porta corridoio/bagno1 (cella 87)
-diagram = assemblyDiagramInit([3,1,2])([[1.25,.5,1.25],[.3],[2.2,.5]])
-master = diagram2cell(diagram,master,87)
-#porta corridoio/camera2 (cella 116)
-diagram = assemblyDiagramInit([3,1,2])([[.25,.5,.25],[.3],[2.2,.5]])
-master = diagram2cell(diagram,master,116)
-#porta corridoio/camera3 (cella 126)
-diagram = assemblyDiagramInit([1,3,2])([[.3],[.5,.5,.5],[2.2,.5]])
-master = diagram2cell(diagram,master,126)
-#porta camera3/bagno2 (cella 122)
-diagram = assemblyDiagramInit([1,3,2])([[.3],[.5,.5,.5],[2.2,.5]])
-master = diagram2cell(diagram,master,122)
-#finestra soggiorno (cella 59)
-diagram = assemblyDiagramInit([2,1,3])([[2,1],[.3],[1,1.4,.3]])
-master = diagram2cell(diagram,master,59)
-#finestra1 camera2 (cella 117)
-diagram = assemblyDiagramInit([2,1,3])([[.5,.5],[.3],[1,1.4,.3]])
-master = diagram2cell(diagram,master,117)
-#finestra2 camera2 (cella 158)
-diagram = assemblyDiagramInit([1,4,3])([[.3],[1,.5,1,.5],[1,1.4,.3]])
-master = diagram2cell(diagram,master,158)
-#finestra camera3 (cella 150)
-diagram = assemblyDiagramInit([1,2,3])([[.3],[1,.5],[1,1.4,.3]])
-master = diagram2cell(diagram,master,150)
+#porta d'entrata (cella 27)
+diagram = assemblyDiagramInit([2,1,2])([[1.7,.3],[.3],[2.2,.5]])
+master = diagram2cell(diagram,master,27)
 
 hpc = SKEL_1(STRUCT(MKPOLS(master)))
 hpc = cellNumbering (master,hpc)(range(len(master[1])),RED,1)
+#VIEW(hpc)
+
+#porta camera (cella 53)
+diagram = assemblyDiagramInit([1,3,2])([[.3],[.5,1,.5],[2.2,.5]])
+#diagram = assemblyDiagramInit([1,1,2])([[.3],[1],[2.2,.5]])
+master = diagram2cell(diagram,master,52)
+
+hpc = SKEL_1(STRUCT(MKPOLS(master)))
+hpc = cellNumbering (master,hpc)(range(len(master[1])),RED,1)
+#VIEW(hpc)
+#porta bagno (cella 61)
+diagram = assemblyDiagramInit([1,3,2])([[.3],[.15,.7,.15],[2.2,.5]])
+master = diagram2cell(diagram,master,59)
+
+hpc = SKEL_1(STRUCT(MKPOLS(master)))
+hpc = cellNumbering (master,hpc)(range(len(master[1])),RED,1)
+#VIEW(hpc)
+#porta camera-letto (cella 65)
+diagram = assemblyDiagramInit([1,3,2])([[.3],[1,1,1],[2.2,.5]])
+master = diagram2cell(diagram,master,62)
+
+hpc = SKEL_1(STRUCT(MKPOLS(master)))
+hpc = cellNumbering (master,hpc)(range(len(master[1])),RED,1)
+#VIEW(hpc)
+
+#porta corridoio/camera1 (cella 90)
+#diagram = assemblyDiagramInit([3,1,2])([[1.25,.5,1.25],[.3],[2.2,.5]])
+#master = diagram2cell(diagram,master,89)
+
+#finestra soggiorno/balcone (cella 99)
+diagram = assemblyDiagramInit([1,3,2])([[.3],[.8,1.4,.8],[2.2,.5]])
+master = diagram2cell(diagram,master,95)
+
+hpc = SKEL_1(STRUCT(MKPOLS(master)))
+hpc = cellNumbering (master,hpc)(range(len(master[1])),RED,1)
+#VIEW(hpc)
+
+#finestra camera/balcone (cella 103)
+diagram = assemblyDiagramInit([1,3,2])([[.3],[.65,.7,.65],[2.2,.5]])
+master = diagram2cell(diagram,master,98)
+
+hpc = SKEL_1(STRUCT(MKPOLS(master)))
+hpc = cellNumbering (master,hpc)(range(len(master[1])),RED,1)
+#VIEW(hpc)
+#finestra1 bagno (cella 111)
+diagram = assemblyDiagramInit([1,3,3])([[.3],[.625,.7,.625],[1,1.4,.3]])
+master = diagram2cell(diagram,master,105)
+
+hpc = SKEL_1(STRUCT(MKPOLS(master)))
+hpc = cellNumbering (master,hpc)(range(len(master[1])),RED,1)
+#VIEW(hpc)
+#finestra2 camera (cella 115)
+diagram = assemblyDiagramInit([1,3,3])([[.3],[.8,1.4,.8],[1,1.4,.3]])
+master = diagram2cell(diagram,master,108)
+
+hpc = SKEL_1(STRUCT(MKPOLS(master)))
+hpc = cellNumbering (master,hpc)(range(len(master[1])),RED,1)
+#VIEW(hpc)
+
+
+hpc = SKEL_1(STRUCT(MKPOLS(master)))
+hpc = cellNumbering (master,hpc)(range(len(master[1])),GREEN,1)
 VIEW(hpc)
 
+#balcone
+
 #RIMOZIONE PORTE E FINESTRE
-toRemove = [160,219,166,184,190,196,202,208,214,172,228,237,231,243]
-master = master[0], [cell for k,cell in enumerate(master[1]) if not (k in toRemove)]
-DRAW(master)
+porte = [133,139,145,151]
+finestre = [180,171]
+balconi = [163, 157]
+balcone = [111,120,122,124,126,128,130,132,118]
+toRemove2 = porte + finestre + balconi + balcone
+masterF = master[0], [cell for k,cell in enumerate(master[1]) if not (k in toRemove2)]
+DRAW(masterF)
 
 
