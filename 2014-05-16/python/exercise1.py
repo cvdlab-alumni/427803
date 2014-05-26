@@ -108,7 +108,7 @@ hpc = cellNumbering (master,hpc)(range(len(master[1])),RED,1)
 
 hpc = SKEL_1(STRUCT(MKPOLS(master)))
 hpc = cellNumbering (master,hpc)(range(len(master[1])),GREEN,1)
-VIEW(hpc)
+#VIEW(hpc)
 
 #balcone
 

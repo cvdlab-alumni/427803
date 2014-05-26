@@ -4,6 +4,7 @@ sys.path.insert(0, '/Users/toucherjay/Desktop/lar-cc/lib/py')
 from larcc import *
 from sysml import *
 from splines import *
+from architectural import *
 from exercise1 import *
 
 GRID = COMP([INSR(PROD),AA(QUOTE)])
@@ -31,13 +32,9 @@ garden3D = COLOR([0.012,0.753,0.234])(garden3D)
 out = T([1,2])([4.5,7.6])(STRUCT([garden3D,fence3D]))
 
 
-
-#ALTRI PIANI
-
-
 DRAW = COMP([VIEW,STRUCT,MKPOLS])
 
-#appartamento
+"""Appartamento"""
 
 master = assemblyDiagramInit([7,15,2])([[.3,2,.3,4,.3,1.5,.05],[.3,1,0.3,0.2,.05,3,.1,2,.1,.4,.05,1.3,.1,3,.3],[.3,2.7]])
 V,CV = master
@@ -122,10 +119,6 @@ hpc = SKEL_1(STRUCT(MKPOLS(master)))
 hpc = cellNumbering (master,hpc)(range(len(master[1])),RED,1)
 #VIEW(hpc)
 
-
-
-#balcone
-
 #RIMOZIONE PORTE E FINESTRE
 porte = [133,139,145,151]
 finestre = [180,171]
@@ -135,56 +128,59 @@ toRemove2 = porte + finestre + balconi + balcone
 master0 = master[0], [cell for k,cell in enumerate(master[1]) if not (k in toRemove2)]
 DRAW(master0)
 
+"""Assemblaggio Palazzina"""
 floor0 = STRUCT(MKPOLS(master0))
 floor1 = T(3)(3)(STRUCT(MKPOLS(masterF)))
 floor2 = T(3)(3)(floor1)
 floor3 = T(3)(3)(floor2)
 floor4 = T(3)(3)(floor3)
-#tetto = COLOR([0.545,0.27,0])(T([1,3])([-1,15])(CUBOID([14,11,.3])))
+
+tetto = COLOR([0.95,0.90,0.87])(T([1,2,3])([-6.9,-12.2,15])(CUBOID([13.8,24.4,0.5])))
 alaE = STRUCT([floor0,floor1,floor2,floor3,floor4])
 VIEW(alaE)
 alaO = T(1)(0)(R([2,2])(3/2*(PI))(alaE))
-ala1 = STRUCT([alaO,alaE])
-ala2 = R([1,2])(PI)(ala1)
+alaFRONT = STRUCT([alaO,alaE])
+alaBACK = R([1,2])(PI)(alaFRONT)
 portone = T(2)(-1)(CUBOID([8.45,2,2.7]))
+
+"""Pianerottolo"""
 pianerottolo = COLOR([0.9,0.85,0.1])(T([1,2])([-5,-1.5])(CUBOID([15,3,.3])))
+
+"""Ingresso Palazzo"""
 muro_androne = CUBOID([4.3,0.3,3])
 m_andr_sx = T([1,2])([2.6,-1.5])(muro_androne)
 m_andr_dx = T([1,2])([2.6,1.2])(muro_androne)
-palazzo = STRUCT([ala1,ala2])
-ala_scale = T([1,2])([-6.9,-1.3])(CUBOID([.3,2.6,15]))
 
-palazzo_ingresso = DIFFERENCE([palazzo,portone])
-palazzo_scale = DIFFERENCE([palazzo_ingresso,ala_scale])
-VIEW(palazzo_scale)
-
-
+"""Lato Scale Ala Back"""
+ala_scale = T([1,2])([-6.9,-1.3])(CUBOID([4.6,2.6,15]))
+alaFRONT_complete = DIFFERENCE([alaFRONT,portone])
+alaBACK_complete = DIFFERENCE([alaBACK,ala_scale])
 #SCALE
 DRAW = COMP([VIEW,STRUCT,MKPOLS])
-master_scale = assemblyDiagramInit([2,1,2])([[.3,6.3],[2.6],[.3,2.7]])
+master_scale = assemblyDiagramInit([3,3,2])([[.3,4,5.2],[.3,2.6,.3],[.3,2.7]])
 V,CV = master_scale
 hpc = SKEL_1(STRUCT(MKPOLS(master_scale)))
 hpc = cellNumbering (master_scale,hpc)(range(len(master_scale[1])),RED,1)
-VIEW(hpc)
+#VIEW(hpc)
 
-toRemoveScale = [3]
+toRemoveScale = [17,16,15,13,12,9,8]
 master_scale = master_scale[0], [cell for k,cell in enumerate(master_scale[1]) if not (k in toRemoveScale)]
 
 #Finestre scale
 diagram = assemblyDiagramInit([1,3,3])([[.3],[.6,1.4,.6],[1,1.4,.3]])
-master_scale = diagram2cell(diagram,master_scale,1)
+master_scale = diagram2cell(diagram,master_scale,3)
 
 hpc = SKEL_1(STRUCT(MKPOLS(master_scale)))
 hpc = cellNumbering (master_scale,hpc)(range(len(master_scale[1])),RED,1)
-VIEW(hpc)
+#VIEW(hpc)
 
 #Rimuove finestre
-removeFinestre = [6]
+removeFinestre = [14]
 master_scale = master_scale[0], [cell for k,cell in enumerate(master_scale[1]) if not (k in removeFinestre)]
 
 DRAW(master_scale)
 
-piano_scale = T([1,2])([-6.9,-1.3])(STRUCT(MKPOLS(master_scale)))
+piano_scale = T([1,2])([-6.9,-1.6])(STRUCT(MKPOLS(master_scale)))
 pscale0 = T(3)(3)(piano_scale)
 pscale1 = T(3)(3)(pscale0)
 pscale2 = T(3)(3)(pscale1)
@@ -192,7 +188,32 @@ pscale3 = T(3)(3)(pscale2)
 
 scale = STRUCT([piano_scale,pscale0,pscale1,pscale2,pscale3])
 
-VIEW(STRUCT([palazzo_ingresso,pianerottolo,m_andr_dx,m_andr_sx,scale]))
+"""stair = spiralStair(width=0.2,R=3,r=0.25,riser=0.1,pitch=4.4,nturns=1.75,steps=36)
+stair = larApply(r(0,0,3*PI/4))(stair)
+stair = larApply(t(0,-3,0))(stair)
+stairColumn = larApply(t(0,-3,0))(larRod(0.25,4.2)())
+mod_1 = larQuote1D( 6*[0.2,-3.8] )"""
+
+"""Scale a chiocciola""
+stair = spiralStair(width=0.2,R=3,r=0.25,riser=0.1,pitch=4.4,nturns=1.75,steps=36)
+stair = larApply(r(0,0,3*PI/4))(stair)
+stair = larApply(t(0,-3,0))(stair)
+stairColumn = larApply(t(0,-3,0))(larRod(0.25,4.2)())
+mod_1 = larQuote1D( 6*[0.2,-3.8] )
+
+""Stair
+stair = spiralStair(width=0.2,R=3,r=0.25,riser=0.1,pitch=4.4,nturns=1.5,steps=24)
+stair = larApply(r(0,0,2*PI))(stair)
+stair = larApply(t(0,-3,0))(stair)
+stairColumn = larApply(t(0,-3,0))(larRod(0.25,4.2)())
+stairs3D = evalStruct(Struct([stairColumn,stair,t(0,0,3)]*4))
+stairs = (STRUCT(CAT(AA(MKPOLS)(stairs3D))))
+VIEW(stairs)"""
+
+alaBACK_scale = STRUCT([alaBACK_complete,scale])
+palazzo_noBalconi = STRUCT([alaFRONT_complete,alaBACK_scale,pianerottolo])
+VIEW(STRUCT([tetto,palazzo_noBalconi]))
+
 
 
 
