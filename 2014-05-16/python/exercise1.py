@@ -4,7 +4,7 @@ sys.path.insert(0, '/Users/toucherjay/Desktop/lar-cc/lib/py')
 from larcc import *
 from sysml import *
 
-DRAW = COMP([VIEW,STRUCT,MKPOLS])
+#DRAW = COMP([VIEW,STRUCT,MKPOLS])
 
 #appartamento
 
@@ -32,7 +32,7 @@ toRemove = roomsToRemove + wallsToRemove + remove
 
 #in CV di master inserisco solo le celle NON da rimuovere
 master = V,[cell for k,cell in enumerate(CV) if not (k in toRemove)]
-DRAW(master)
+#DRAW(master)
 
 hpc = SKEL_1(STRUCT(MKPOLS(master)))
 hpc = cellNumbering (master,hpc)(range(len(master[1])),RED,1)
@@ -119,6 +119,6 @@ balconi = [163, 157]
 balcone = [111,120,122,124,126,128,130,132,118]
 toRemove2 = porte + finestre + balconi + balcone
 masterF = master[0], [cell for k,cell in enumerate(master[1]) if not (k in toRemove2)]
-DRAW(masterF)
+#DRAW(masterF)
 
 
