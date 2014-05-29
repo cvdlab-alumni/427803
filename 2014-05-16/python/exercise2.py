@@ -166,7 +166,7 @@ master_scale = assemblyDiagramInit([4,3,2])([[.3,1.6,2.6,5.2],[.3,2.6,.3],[.3,2.
 V,CV = master_scale
 hpc = SKEL_1(STRUCT(MKPOLS(master_scale)))
 hpc = cellNumbering (master_scale,hpc)(range(len(master_scale[1])),RED,1)
-VIEW(hpc)
+#VIEW(hpc)
 
 toRemoveScale = [23,21,19,15,9,8]
 master_scale = master_scale[0], [cell for k,cell in enumerate(master_scale[1]) if not (k in toRemoveScale)]
@@ -177,7 +177,7 @@ master_scale = diagram2cell(diagram,master_scale,3)
 
 hpc = SKEL_1(STRUCT(MKPOLS(master_scale)))
 hpc = cellNumbering (master_scale,hpc)(range(len(master_scale[1])),RED,1)
-VIEW(hpc)
+#VIEW(hpc)
 
 #Rimuove finestre
 removeFinestre = [21]
@@ -194,9 +194,82 @@ pscale3 = T(3)(3)(pscale2)
 scale = STRUCT([piano_scale,pscale0,pscale1,pscale2,pscale3])
 
 
+#FINESTRE
+glass_mat = [0,0.19,0.39,1, 0,0,0,0.2, 0,0,0,1, 0,0,0,1, 100]
+
+#Finestre Scale
+wglass1 = CUBOID([.1,1.4,1.4])
+wglass1 = T([1,2,3])([-6.9,-.7,1.3 ])(wglass1)
+wglass1 = MATERIAL(glass_mat)(wglass1)
+wglass2 = T(3)(3)(wglass1)
+wglass3 = T(3)(3)(wglass2)
+wglass4 = T(3)(3)(wglass3)
+wglass5 = T(3)(3)(wglass4)
+
+#material:  	     ambient         diffuse  specular emission shininess
+finestre_scala = STRUCT([wglass1,wglass2,wglass3,wglass4,wglass5])
+
+#Finestre Palazzo
+
+#Balcone Living
+glassLiving = CUBOID([.1,1.4,2.2])
+glassLiving = T([1,2,3])([6.8,2.65,.3])(glassLiving)
+glassLiving = MATERIAL(glass_mat)(glassLiving)
+glassLivingMirrored = T(2)(-6.7)(glassLiving)
+glassLivingBase = STRUCT ([glassLiving, glassLivingMirrored])
+glassLiving1 = T(3)(3)(glassLivingBase)
+glassLiving2 =	T(3)(3)(glassLiving1)
+glassLiving3 = T(3)(3)(glassLiving2)
+glassLiving4 = T(3)(3)(glassLiving3)
+
+finestre_living = STRUCT([glassLivingBase,glassLiving1,glassLiving2,glassLiving3,glassLiving4])
+finestre_living_post = T(1)(-13.6)(finestre_living)
+
+#Balcone Camera
+glassRoom = CUBOID([.1,.7,2.2])
+glassRoom = T([1,2,3])([6.8,5.6,.3])(glassRoom)
+glassRoom = MATERIAL(glass_mat)(glassRoom)
+glassRoomMirrored = T(2)(-11.9)(glassRoom)
+glassRoomBase = STRUCT([glassRoom, glassRoomMirrored])
+glassRoom1 = T(3)(3)(glassRoomBase)
+glassRoom2 = T(3)(3)(glassRoom1)
+glassRoom3 = T(3)(3)(glassRoom2)
+glassRoom4 = T(3)(3)(glassRoom3)
+
+finestreRoom = STRUCT ([glassRoomBase, glassRoom1, glassRoom2, glassRoom3,glassRoom4])
+finestreRoomBack = T(1)(-13.6)(finestreRoom)
+
+#Finestra Bagno
+glassBath = CUBOID([.1,.47,1.4])
+glassBath = T([1,2,3])([6.8,7.915,1.3])(glassBath)
+glassBath = MATERIAL(glass_mat)(glassBath)
+glassBathMirrores = T(2)(-16.3)(glassBath)
+glassBathBase = STRUCT ([glassBath, glassBathMirrores])
+glassBath1 = T(3)(3)(glassBathBase)
+glassBath2 = T(3)(3)(glassBath1)
+glassBath3 = T(3)(3)(glassBath2)
+glassBath4 = T(3)(3)(glassBath3)
+
+finestreBath = STRUCT ([glassBathBase, glassBath1, glassBath2, glassBath3, glassBath4])
+finestreBathBack = T(1)(-13.6)(finestreBath)
+
+#FinestraBed
+glassBed = CUBOID([.1,1.4,1.4])
+glassBed = T([1,2,3])([6.8,9.7,1.3])(glassBed)
+glassBed = MATERIAL(glass_mat)(glassBed)
+glassBedMirrored = T(2)(-20.8)(glassBed)
+glassBedBase = STRUCT ([glassBed, glassBedMirrored])
+glassBed1 = T(3)(3)(glassBedBase)
+glassBed2 = T(3)(3)(glassBed1)
+glassBed3 = T(3)(3)(glassBed2)
+glassBed4 = T(3)(3)(glassBed3)
+
+finestreBed = STRUCT([glassBedBase, glassBed1, glassBed2, glassBed3, glassBed4])
+finestreBedBack = T(1)(-13.6)(finestreBed)
 
 
-#Stair
+
+#Scala
 stair = spiralStair(width=0.1,R=1,r=0.25,riser=0.1,pitch=4.4,nturns=1.5,steps=30)
 stair = larApply(r(0,0,2*PI))(stair)
 stair = larApply(t(-5,0,0))(stair)
@@ -207,7 +280,7 @@ VIEW(stairs)
 
 alaBACK_scale = STRUCT([alaBACK_complete,scale])
 palazzo_noBalconi = STRUCT([alaFRONT_complete,alaBACK_scale,pianerottolo,piano_back,tetto])
-VIEW(STRUCT([palazzo_noBalconi,stairs]))
+VIEW(STRUCT([palazzo_noBalconi,stairs,finestre_scala,finestre_living, finestre_living_post, finestreRoom,finestreRoomBack,finestreBath, finestreBathBack, finestreBed, finestreBedBack]))
 
 
 
