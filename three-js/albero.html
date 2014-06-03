@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+ <head> 
+  <title>Albero-imparando webGL</title> 
+  <style>
+    body{
+      margin: 0;
+      overflow: hidden;
+    }
+     #stats {  /* Align stats top-left */
+      position: absolute;
+      left: 0px;
+      top: 0px;
+    }
+  </style> 
+  </head> 
+  <body>
+    <!-- JavaScript libraries -->
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r67/three.min.js"></script> 
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script> 
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/stats.js/r11/Stats.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5/dat.gui.min.js"></script>
+    <script src="assets/libs/TrackballControls.js"></script>>
+    <!-- Javascript code that runs our Three.js examples --> 
+    <script>
+      // once everything is loaded, we run our Three.js stuff.
+      $(function () {
+        // create a scene, that will hold all our elements such as objects, cameras and lights.
+        var stats = initStats();
+
+        var scene = new THREE.Scene();
+
+        // create a camera, which defines where we're looking at.
+        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        
+          // create a inspectedCamera
+        var inspectedCamera = new THREE.PerspectiveCamera(10, window.innerWidth / window.innerHeight, 10, 100);
+
+        // create a render and set the size
+        var renderer = new THREE.WebGLRenderer();
+
+        //selezioniamo lo sfondo della scena
+        renderer.setClearColor(new THREE.Color(0xEEEEEE));
+        //impostiamo la dimensione della finestra tramite l'oggetto window
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        // create the ground plane
+        var planeGeometry = new THREE.PlaneGeometry(60,40);
+        var planeMaterial = new THREE.MeshBasicMaterial({color: 0x66CC00});
+        var plane = new THREE.Mesh(planeGeometry,planeMaterial);
+
+        // rotate and position the plane
+        plane.rotation.x=-0.5*Math.PI;
+        plane.position.set(0,0,0);
+
+        // add the plane to the scene
+        scene.add(plane);
+
+        var cylinderGeometry = new THREE.CylinderGeometry( 3, 5, 20, 32 );
+        var cylinderMaterial = new THREE.MeshBasicMaterial( {color: 0x993300} );
+        var cylinder = new THREE.Mesh( cylinderGeometry, cylinderMaterial );
+        
+        scene.add( cylinder );
+
+        var sphereGeometry = new THREE.SphereGeometry(7,20,20);
+        var sphereMaterial = new THREE.MeshBasicMaterial({color: 0x009900});
+        var sphere = new THREE.Mesh(sphereGeometry,sphereMaterial);
+
+        cylinder.position.set(0,10,0);
+        sphere.position.set(0,25,0);
+        // position the sphere
+        
+
+        // add the sphere to the scene
+        scene.add(sphere);
+
+        // position and point the camera to the center of the scene
+        camera.position.set(-70,40,30);
+        camera.up = new THREE.Vector3(0,1,0);
+        camera.lookAt(scene.position);
+
+        inspectedCamera.position.set(30,40,-30);
+        inspectedCamera.up = new THREE.Vector3(0,1,0);
+        inspectedCamera.lookAt(scene.position);
+        
+        // add axis helper
+        var axisHelper = new THREE.AxisHelper(3);
+        scene.add(axisHelper);
+        
+        // add cameraHelper
+        var cameraHelper = new THREE.CameraHelper(inspectedCamera);
+        scene.add(inspectedCamera);
+        scene.add(cameraHelper);
+        
+        // add the output of the renderer to the html element
+        $('body').append(renderer.domElement);
+
+        var step = 0;
+        
+        var controls = new function () {
+          this.posX = 0;
+          this.posZ= 0;
+          this.showAxisHelper = true;
+          this.inspectedCamera = false;
+        };
+
+        var gui = new dat.GUI();
+        gui.add(controls, 'posX',-30,30);
+        gui.add(controls, 'posZ',-20,20);
+        
+        var axis_control = gui.add(controls, 'showAxisHelper');
+        var cameraControl = gui.add(controls, 'inspectedCamera');
+
+        // create trackball controls
+        var trackballControls = new THREE.TrackballControls(camera);  
+
+        render();
+
+        var renderCamera = camera;
+        
+        cameraControl.onChange(function (value) {
+          renderCamera = value ? inspectedCamera : camera;
+        });
+
+        axis_control.onChange(function (value) {
+          axisHelper.visible = value;
+        });
+
+        function render() {
+          
+          stats.update();
+          trackballControls.update();
+          cameraHelper.update( );
+          cylinder.position.x = controls.posX;
+          cylinder.position.z = controls.posZ;
+          sphere.position.x = controls.posX;
+          sphere.position.z = controls.posZ;  
+          step +=.01;
+          // rotate the cube around its axes
+          //camera.rotation.x = 100*Math.cos(step);
+          //camera.rotation.z = 100*Math.sin(step);
+          
+          camera.lookAt(scene.position)
+          
+          
+          // render using requestAnimationFrame
+          requestAnimationFrame(render);
+          renderer.render(scene, renderCamera);
+        }
+
+        function initStats() {
+          var stats = new Stats();
+          stats.setMode(0); // 0: fps, 1: ms
+          $('body').append(stats.domElement);
+          return stats;
+        }
+
+      });
+    </script>  
+ </body>
+</html>

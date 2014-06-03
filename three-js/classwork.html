@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html>
+ <head> 
+  <title>Example 1 - Basic skeleton</title> 
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+    #stats {  /* Align stats top-left */
+      position: absolute;
+      left: 0px;
+      top: 0px;
+    }
+  </style> 
+  </head> 
+  <body>
+    <!-- JavaScript libraries -->
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r67/three.min.js"></script> 
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script> 
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/stats.js/r11/Stats.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5/dat.gui.min.js"></script>
+    <script src="assets/libs/TrackballControls.js"></script>
+    <!-- Javascript code that runs our Three.js examples --> 
+    <script>
+      
+      $(function () {
+
+        //----------------------------------------------------------------------------------------------
+        // UTILITY METHODS - everything that helps you writing nice code
+        //---------------------------------------------------------------------------------------------- 
+
+        function lemonPosition(noOfLemon){
+          for (i = 0; i < noOfLemon; i++){
+              var sphereGeometry = new THREE.SphereGeometry(.9,15,15);
+              var sphereMaterial = new THREE.MeshLambertMaterial({color: 0xFFFF00});
+              var lemon = new THREE.Mesh(sphereGeometry,sphereMaterial);
+              var alfa = Math.PI*Math.random();
+              var beta = (2*Math.PI*Math.random())-Math.PI
+              lemon.position.set(8*Math.sin(alfa)*Math.cos(beta), 8*Math.sin(alfa)*Math.sin(beta), 8*Math.cos(alfa));
+              foliage.add(lemon);
+          }
+
+        }
+
+        function treeModelling(modelling){
+          for (i = 0; i < modelling; i++){
+
+              var sphereGeometry = new THREE.SphereGeometry(6,20,20);
+              var sphereMaterial = new THREE.MeshLambertMaterial({color: 0x009900});
+              var littleFoliage = new THREE.Mesh(sphereGeometry,sphereMaterial);
+              var alfa = Math.PI*Math.random();
+              var beta = (2*Math.PI*Math.random())-Math.PI
+              littleFoliage.position.set(5*Math.sin(alfa)*Math.cos(beta), 6*Math.sin(alfa)*Math.sin(beta), 6*Math.cos(alfa));
+              foliage.add(littleFoliage);
+          }
+        }
+
+        function populateForest(numberOfTree, startingPoint){
+          var x = startingPoint[0];
+          var z = startingPoint[1];
+          for (j = 0; j < numberOfTree; j++){
+                // create the nodes that include the tree and the fruits
+                var node_tree = new THREE.Object3D();
+                
+
+                // create lemon tree
+
+                // create "tronco"
+                var geometry = new THREE.CylinderGeometry( 2.5, 3.5, 20, 32 );
+                var material = new THREE.MeshLambertMaterial( {color: 0x993300});
+                var trunk = new THREE.Mesh( geometry, material );
+                node_tree.add(trunk);
+                trunk.position.set(0,10,0);
+
+                // create "chioma"
+                var sphereGeometry = new THREE.SphereGeometry(8,20,20);
+                var sphereMaterial = new THREE.MeshLambertMaterial({color: 0x009900});
+                foliage = new THREE.Mesh(sphereGeometry,sphereMaterial);
+                node_tree.add(foliage);
+                foliage.position.set(0,25,0)
+                
+                    
+                node_tree.position.set(x,0,z);
+                // Position algorithm
+                var val = j+1;  
+                node_tree.position.set(x,0,z);
+                if ((x+z+val)%2 == 0){
+                    x += j+15;
+                    val++;
+                } else {
+                  z += j+15;
+                  val++;
+                }
+                 
+                
+                treeModelling(6*(Math.random())+2);    
+                lemonPosition(79*(Math.random())+17);
+                scene.add(node_tree);
+
+                //treeModelling(6*(Math.random())+2);
+                //lemonPosition(79*(Math.random())+17);
+                //scene.add(node_tree);
+
+              }
+        }
+
+
+        
+        //----------------------------------------------------------------------------------------------
+        // Initializing BASIC environment (STATS, SCENE, CAMERA, RENDER)
+        //----------------------------------------------------------------------------------------------
+        var stats = initStats();
+
+        var scene = new THREE.Scene();
+
+        var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
+
+
+        var renderer = new THREE.WebGLRenderer();
+
+
+
+        //----------------------------------------------------------------------------------------------
+        // AXIS SET UP
+        //----------------------------------------------------------------------------------------------
+        var axisHelper = new THREE.AxisHelper(3);
+        scene.add(axisHelper);
+
+        //----------------------------------------------------------------------------------------------
+        // TRACKBALL SET UP
+        //----------------------------------------------------------------------------------------------        
+        var trackballControls = new THREE.TrackballControls(camera);
+
+
+        //----------------------------------------------------------------------------------------------
+        //  SCENE SET UP - Add your own meshes
+        //---------------------------------------------------------------------------------------------- 
+        renderer.setClearColor(new THREE.Color(0x99FFFF));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        // Abiliting the shadow
+        renderer.shadowMapEnabled = true;
+
+
+       
+        // create the ground plane
+        var planeGeometry = new THREE.PlaneGeometry(300,300);
+        var planeMaterial = new THREE.MeshLambertMaterial({color: 0x00FF00, side: THREE.DoubleSide});
+        planeMaterial.side = THREE.DoubleSide;
+        var plane = new THREE.Mesh(planeGeometry,planeMaterial);
+        plane.rotation.x=-0.5*Math.PI;
+
+        // add the plane to the scene
+        scene.add(plane);
+
+        // choosing a starting point in the plane
+        var startingPoint = new Array(-50,-50);
+        populateForest(10, startingPoint);
+
+        
+        
+
+        
+        
+
+
+        
+
+
+
+        //----------------------------------------------------------------------------------------------
+        // CAMERAs SET UP  
+        //---------------------------------------------------------------------------------------------- 
+        camera.position.set(-100,40,30);
+        camera.up = new THREE.Vector3(0,1,0);
+        camera.lookAt(scene.position);
+
+      
+
+        //----------------------------------------------------------------------------------------------
+        // LIGHTS SET UP 
+        //---------------------------------------------------------------------------------------------- 
+        //var spotLight = new THREE.SpotLight( 0x404040 ,30, 200, 30, 0.001);
+        //spotLight.position.set(100,100,0);
+        //scene.add(spotLight);
+
+        // add subtle ambient lighting
+        var ambiColor = "#1c1c1c";
+        var ambientLight = new THREE.AmbientLight(ambiColor);
+        scene.add(ambientLight);
+
+        var target = new THREE.Object3D();
+        target.position = new THREE.Vector3(5, 0, 0);
+
+        var pointColor = "#ff5808";
+        var directionalLight = new THREE.DirectionalLight(pointColor);
+        directionalLight.position.set(-40, 60, -10);
+        directionalLight.castShadow = true;
+        directionalLight.shadowCameraNear = 2;
+        directionalLight.shadowCameraFar = 50;
+        directionalLight.shadowCameraLeft = -20;
+        directionalLight.shadowCameraRight = 20;
+        directionalLight.shadowCameraTop = 20;
+        directionalLight.shadowCameraBottom = -20;
+
+        directionalLight.intensity = 0.5;
+        directionalLight.shadowMapHeight = 1024;
+        directionalLight.shadowMapWidth = 1024;
+
+
+        scene.add(directionalLight);
+
+
+
+        //----------------------------------------------------------------------------------------------
+        // HELPER ELEMENTS SET UP 
+        //---------------------------------------------------------------------------------------------- 
+        //var spotLightHelper = new THREE.SpotLightHelper(spotLight);
+        //scene.add(spotLightHelper);
+
+        // add a small sphere simulating the pointlight
+        var sphereLight = new THREE.SphereGeometry(0.5);
+        var sphereLightMaterial = new THREE.MeshBasicMaterial({color: 0xac6c25});
+        var sphereLightMesh = new THREE.Mesh(sphereLight, sphereLightMaterial);
+        sphereLightMesh.castShadow = true;
+
+        sphereLightMesh.position = new THREE.Vector3(3, 20, 3);
+        scene.add(sphereLightMesh);
+
+
+        //----------------------------------------------------------------------------------------------
+        // APPEND THE RENDERER TO THE PAGE BODY
+        //---------------------------------------------------------------------------------------------- 
+        $('body').append(renderer.domElement);
+
+        var step = 0;
+
+        var invert = 1;
+        var phase = 0;
+
+        //----------------------------------------------------------------------------------------------
+        // CONTROLS FUNCTION SET UP - helper for the CONTROL PANEL
+        //---------------------------------------------------------------------------------------------- 
+        var controls = new function () {
+          
+          this.ambientColor = ambiColor;
+          this.pointColor = pointColor;
+          this.intensity = 0.5;
+          this.debug = false;
+          this.castShadow = true;
+          this.onlyShadow = false;
+          this.target = "Plane";
+      }
+
+        //----------------------------------------------------------------------------------------------
+        // SET UP GUI CONTROL - to manage which include in the panel
+        //---------------------------------------------------------------------------------------------- 
+        var gui = new dat.GUI();
+
+
+        gui.addColor(controls, 'ambientColor').onChange(function (e) {
+            ambientLight.color = new THREE.Color(e);
+        });
+
+        gui.addColor(controls, 'pointColor').onChange(function (e) {
+            directionalLight.color = new THREE.Color(e);
+        });
+
+        gui.add(controls, 'intensity', 0, 5).onChange(function (e) {
+            directionalLight.intensity = e;
+        });
+
+        gui.add(controls, 'debug').onChange(function (e) {
+            directionalLight.shadowCameraVisible = e;
+        });
+
+        gui.add(controls, 'castShadow').onChange(function (e) {
+            directionalLight.castShadow = e;
+        });
+
+        gui.add(controls, 'onlyShadow').onChange(function (e) {
+            directionalLight.onlyShadow = e;
+        });
+          
+        
+        //----------------------------------------------------------------------------------------------
+        // UTILITY CODE - to start the render function and to call others methods
+        //----------------------------------------------------------------------------------------------
+        //var renderCamera = camera;
+
+        render();
+
+
+        //----------------------------------------------------------------------------------------------
+        // UI CHECK BOX SET UP - to manage which checkbox include in the panel
+        //---------------------------------------------------------------------------------------------- 
+
+
+        //----------------------------------------------------------------------------------------------
+        // RENDER FUNCTION - to manage the utility stats (left corner)
+        //----------------------------------------------------------------------------------------------    
+
+        function render(){
+          stats.update();
+          trackballControls.update();
+          //spotLightHelper.update();
+
+          // Sun simulating
+          sphereLightMesh.position.z = -8;
+          sphereLightMesh.position.y = +(27 * (Math.sin(step / 3)));
+          sphereLightMesh.position.x = 10 + (26 * (Math.cos(step / 3)));
+
+          directionalLight.position = sphereLightMesh.position;
+
+          requestAnimationFrame(render);
+          renderer.render(scene, camera);
+
+        }     
+
+        //----------------------------------------------------------------------------------------------
+        // INITSTATS FUNCTION - to manage the utility stats (left corner)
+        //---------------------------------------------------------------------------------------------- 
+        function initStats() {
+          var stats = new Stats();
+          stats.setMode(0); // 0: fps, 1: ms
+          $('body').append(stats.domElement);
+          return stats;
+        }
+        
+
+        
+
+      });
+    </script>  
+ </body>
+</html>

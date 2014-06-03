@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+ <head> 
+  <title>Example 1 - Basic skeleton</title> 
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+    #stats {  /* Align stats top-left */
+      position: absolute;
+      left: 0px;
+      top: 0px;
+    }
+  </style> 
+  </head> 
+  <body>
+    <!-- JavaScript libraries -->
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r67/three.min.js"></script> 
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script> 
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/stats.js/r11/Stats.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5/dat.gui.min.js"></script>
+    <script src="assets/libs/TrackballControls.js"></script>
+    <!-- Javascript code that runs our Three.js examples --> 
+    <script>
+      
+      $(function () {
+
+        //----------------------------------------------------------------------------------------------
+        // UTILITY METHODS - everything that helps you writing nice code
+        //---------------------------------------------------------------------------------------------- 
+
+
+        function DecToHex(n){
+        //It converts from Dec (0..255) to HEX (stringa a due caratteri)
+          hex = n.toString(16);
+          
+          if(hex.length == 1) hex="0"+hex; /*Add zero ahead if it is a single number*/
+            return hex.toUpperCase();
+        }
+
+        function HexToDec(s){
+        //It converts from  HEX to Dec
+          return parseInt(s,16);
+        }
+
+        function randomColor(n){
+        //Calculate Hex color
+        rc = new Array(8);
+        for(i=0;i<8;i++)
+        rc[i]=Math.floor(Math.random() * n);
+        return HEX(rc);
+        }
+
+
+        //----------------------------------------------------------------------------------------------
+        // Initializing BASIC environment (STATS, SCENE, CAMERA, RENDER)
+        //----------------------------------------------------------------------------------------------
+        var stats = initStats();
+
+        var scene = new THREE.Scene();
+
+        var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
+
+        var inspectedCamera = new THREE.PerspectiveCamera(10, window.innerWidth / window.innerHeight, 10, 100);
+
+
+        var renderer = new THREE.WebGLRenderer();
+
+
+        //----------------------------------------------------------------------------------------------
+        // AXIS SET UP
+        //----------------------------------------------------------------------------------------------
+        var axisHelper = new THREE.AxisHelper(3);
+        scene.add(axisHelper);
+
+        //----------------------------------------------------------------------------------------------
+        // TRACKBALL SET UP
+        //----------------------------------------------------------------------------------------------        
+        var trackballControls = new THREE.TrackballControls(camera);
+
+
+        //----------------------------------------------------------------------------------------------
+        //  SCENE SET UP - Add your own meshes
+        //---------------------------------------------------------------------------------------------- 
+        renderer.setClearColor(new THREE.Color(0xEEEEEE));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        var cubeGeometry = new THREE.BoxGeometry(1,1,1);
+        var cubeMaterial = new THREE.MeshBasicMaterial({color: 0x404040});
+        cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+        cube.position.set(0,0,0);
+        scene.add(cube)
+
+        // create the ground plane
+        var planeGeometry = new THREE.PlaneGeometry(100,100);
+        var planeMaterial = new THREE.MeshBasicMaterial({color: 0x009900, side: THREE.DoubleSide});
+        //planeMaterial.side = THREE.DoubleSide;
+        var plane = new THREE.Mesh(planeGeometry,planeMaterial);
+        plane.rotation.x=-0.5*Math.PI;
+
+        // add the plane to the scene
+        scene.add(plane);
+
+
+        //----------------------------------------------------------------------------------------------
+        // CAMERAs SET UP  
+        //---------------------------------------------------------------------------------------------- 
+        camera.position.set(-100,40,30);
+        camera.up = new THREE.Vector3(0,1,0);
+        camera.lookAt(scene.position);
+
+        inspectedCamera.position.set(30,40,-30);
+        inspectedCamera.up = new THREE.Vector3(0,1,0);
+        inspectedCamera.lookAt(scene.position);
+
+        //----------------------------------------------------------------------------------------------
+        // LIGHTS SET UP 
+        //---------------------------------------------------------------------------------------------- 
+        var spotLight = new THREE.SpotLight( 0x404040 ,40, 4000, 70, 0.001);
+        spotLight.position.set(100,100,0);
+        scene.add(spotLight);
+
+        //----------------------------------------------------------------------------------------------
+        // HELPER ELEMENTS SET UP 
+        //---------------------------------------------------------------------------------------------- 
+        var cameraHelper = new THREE.CameraHelper(inspectedCamera);
+        scene.add(inspectedCamera);
+        scene.add(cameraHelper);
+
+        //----------------------------------------------------------------------------------------------
+        // APPEND THE RENDERER TO THE PAGE BODY
+        //---------------------------------------------------------------------------------------------- 
+        $('body').append(renderer.domElement);
+
+
+        //----------------------------------------------------------------------------------------------
+        // CONTROLS FUNCTION SET UP - helper for the CONTROL PANEL
+        //---------------------------------------------------------------------------------------------- 
+        var controls = new function () {
+          this.cameraPositionX = 0;
+          this.cameraPositionZ = 0;
+          this.cameraPositionY = 0;
+
+          this.colorScene = 0xEEEEEE;
+          this.inspectedCamera = false;
+
+
+
+          this.controlPosX = 0;
+          this.controlPosZ = 0;
+          this.showAxisHelper = true;
+          this.showSpotLight = true;
+        };
+
+        //----------------------------------------------------------------------------------------------
+        // SET UP GUI CONTROL - to manage which include in the panel
+        //---------------------------------------------------------------------------------------------- 
+        var gui = new dat.GUI();
+        gui.add(controls, 'cameraPositionX',0.01,1);
+        gui.add(controls, 'cameraPositionZ',0,.01);
+        gui.add(controls, 'cameraPositionY',-50,50);
+
+        
+
+        gui.add(controls, 'colorScene',0,256);
+
+
+        //CHECK BOX
+        var axisControl = gui.add(controls, 'showAxisHelper');
+        var spotLightControl = gui.add(controls, 'showSpotLight');
+        var cameraControl = gui.add(controls, 'inspectedCamera');
+
+        
+        //----------------------------------------------------------------------------------------------
+        // UTILITY CODE - to start the render function and to call others methods
+        //----------------------------------------------------------------------------------------------
+        var renderCamera = camera;
+
+        render();
+
+
+        //----------------------------------------------------------------------------------------------
+        // UI CHECK BOX SET UP - to manage which checkbox include in the panel
+        //---------------------------------------------------------------------------------------------- 
+        axisControl.onChange(function (value) {
+        axisHelper.visible = value;
+        });
+
+        spotLightControl.onChange(function (value) {
+        lightHelper.visible = value;
+        });
+
+
+        cameraControl.onChange(function (value) {
+        renderCamera = value ? inspectedCamera : camera;
+        });
+        
+        //----------------------------------------------------------------------------------------------
+        // RENDER FUNCTION - to manage RENDERING,ANIMATIONS, UTILITIES ETC 
+        //---------------------------------------------------------------------------------------------- 
+        function render() {
+          stats.update();
+          trackballControls.update();
+
+          camera.position.x = controls.cameraPositionY*Math.cos(controls.cameraPositionX)
+          camera.position.z = controls.cameraPositionY*Math.sin(controls.cameraPositionZ)
+          camera.position.y = controls.cameraPositionY
+          camera.lookAt(scene.position);
+
+
+          renderer.setClearColor = new THREE.Color(controls.colorScene);
+
+
+          //sphere.position.x = controls.controlPosX;
+          //sphere.position.z = controls.controlPosZ;
+          //cylinder.position.x = controls.controlPosX
+          //cylinder.position.z = controls.controlPosZ;
+
+
+
+        // bounce the sphere up and down
+        
+          // bounce the sphere up and down
+          //step+=0.001;
+          //camera.position.x = 100*Math.cos(step)
+          //camera.position.z = 100*Math.sin(step)
+          //camera.lookAt(scene.position);
+
+          // render using requestAnimationFrame
+          requestAnimationFrame(render);
+          renderer.render(scene, renderCamera);
+
+        }
+
+        //----------------------------------------------------------------------------------------------
+        // INITSTATS FUNCTION - to manage the utility stats (left corner)
+        //---------------------------------------------------------------------------------------------- 
+        function initStats() {
+          var stats = new Stats();
+          stats.setMode(0); // 0: fps, 1: ms
+          $('body').append(stats.domElement);
+          return stats;
+        }
+        
+
+        
+
+      });
+    </script>  
+ </body>
+</html>

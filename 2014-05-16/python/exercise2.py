@@ -12,29 +12,6 @@ from lar2psm import *
 
 GRID = COMP([INSR(PROD),AA(QUOTE)])
 
-#giardino
-controlpoints = [[0, 2.3], [0.3, 5.00], [5.19, 5], [5.38, 2.43]]
-dom = larDomain([3])
-mapping = larBezierCurve(controlpoints)
-obj = larMap(mapping)(dom)
-garden = STRUCT(MKPOLS(obj))
-garden = STRUCT([garden,POLYLINE([[0,3.3],[0,0],[8.4,0]])])
-garden3D = DIFFERENCE([PROD([SOLIDIFY(garden),Q(0.3)]),CUBOID([8.4,.1,.3])])
-#VIEW (SOLIDIFY(garden),Q(0.3))
-#recinto
-controlpoints = [[1, 3.45], [1.78, 5.05], [4.02, 5.05], [4.82, 3.6]]
-dom = larDomain([64])
-mapping = larBezierCurve(controlpoints)
-obj = larMap(mapping)(dom)
-fence = STRUCT(MKPOLS(obj))
-fence = STRUCT([fence,POLYLINE([[.01,3.4],[0,0],[8.51,.1]])])
-fence3D = PROD([SOLIDIFY(fence),Q(1)])
-fence3D = DIFFERENCE([fence3D,PROD([SOLIDIFY(garden),Q(1)])])
-garden3D = COLOR([0.012,0.753,0.234])(garden3D)
-
-out = T([1,2])([4.5,7.6])(STRUCT([garden3D,fence3D]))
-
-
 DRAW = COMP([VIEW,STRUCT,MKPOLS])
 
 """Appartamento"""
@@ -276,11 +253,93 @@ stair = larApply(t(-5,0,0))(stair)
 stairColumn = larApply(t(-5,0,0))(larRod(0.1,3.3)())
 stairs3D = evalStruct(Struct([stairColumn,stair,t(0,0,3)]*4))
 stairs = COLOR([0.95,0.90,0.87])(STRUCT(CAT(AA(MKPOLS)(stairs3D))))
-VIEW(stairs)
+#VIEW(stairs)
+
+#Balcone
+baseBalcone = CUBOID([1.6,5.7,.3])
+palettoRinghiera = CUBOID([0.05,0.05,0.65])
+paletti = STRUCT(NN(38)([palettoRinghiera,T(2)(0.15)]))
+paletti = T(3)(0.3)(paletti)
+palettoRinghieraX = palettoRinghiera
+palettoRinghieraX = T([1,2])([1,2])(palettoRinghieraX)
+palettiX = STRUCT(NN(10)([palettoRinghiera,T(2)(0.15)]))
+palettiX = R([1,2])(PI/2)(palettiX)
+palettiX = T([1,3])([1.5,0.3])(palettiX)
+upRinghieraY = CUBOID([0.05,5.7,0.05])
+upRinghieraY = T(3)(0.95)(upRinghieraY)
+
+upRinghieraX = CUBOID([1.6,0.05,0.05])
+upRinghieraX = T(3)(0.95)(upRinghieraX)
+upRinghieraX  =STRUCT(NN(2)([upRinghieraX,T(2)(5.65)]))
+palettiX = STRUCT(NN(2)([palettiX,T(2)(5.65)]))
+upRinghiera = STRUCT([upRinghieraX,upRinghieraY])
+balcone = STRUCT([baseBalcone,paletti,upRinghiera,palettiX])
+balconeSxAnt = T([1,2,3])([8.45,-1.8,3])(R([1,2])(PI)(balcone))
+balconeSxAnt1 = T(3)(3)(balconeSxAnt)
+balconeSxAnt2 = T(3)(3)(balconeSxAnt1)
+balconeSxAnt3 = T(3)(3)(balconeSxAnt2)
+balconiSxA = STRUCT([balconeSxAnt,balconeSxAnt1,balconeSxAnt2,balconeSxAnt3])
+balconiDxA = T(2)(9.3)(balconiSxA)
+balconiAnt = COLOR([0.95,0.90,0.87])(STRUCT([balconiSxA,balconiDxA]))
+balconiPost = COLOR([0.95,0.90,0.87])(R([1,2])(PI)(balconiAnt))
+
+
+#Portone
+portone = T([1,2])([6.6,-1])(CUBOID([.3,2,2.7]))
+portone = MATERIAL(glass_mat)(portone)
+cornice = COLOR([0.95,0.90,0.87])(T([1,2])([6.9,-1])(CUBOID([0.01,.2,2.7])))
+corniceD = T(2)(1.8)(cornice)
+corniceM = T(2)(.9)(cornice)
+corniceS = COLOR([0.95,0.90,0.87])(T([1,2,3])([6.9,-1,2.7])(CUBOID([0.01,2,.3])))
+portoneC = STRUCT([portone, cornice,corniceD,corniceS,corniceM])
+
+#PORTE CASE
+muro_androne = CUBOID([2,0.3,2.5])
+porta_sx = COLOR([0.6,0.4,0])(T([1,2])([.3,-1.6])(muro_androne))
+porta_dx = COLOR([0.6,0.4,0])(T([1,2])([.3,1.3])(muro_androne))
+porte_avanti = STRUCT([porta_sx,porta_dx])
+porte_dietro = T(1)(-2.3)(porte_avanti)
+porte_terra = STRUCT([porte_avanti,porte_dietro])
+porte1 = T(3)(3)(porte_terra)
+porte2 = T(3)(3)(porte1)
+porte3 = T(3)(3)(porte2)
+porte4 = T(3)(3)(porte3)
+
+porte_tot = STRUCT ([porte_terra, porte1, porte2, porte3,porte4])
+
+#Prato
+controlpoints = [[20,0],[22,0],[24,0],[26,-1],[28,-4],[29,-7],[30,-10]]
+dom = larDomain([64])
+mapping = larBezierCurve(controlpoints)
+obj = larMap(mapping)(dom)
+curva = STRUCT(MKPOLS(obj))
+hill = (STRUCT([curva,S(1)(-1)(curva),POLYLINE([[-20,0],[20,0]]),POLYLINE([[-30,-10],[30,-10]])]))
+hill2D = COLOR([0.002,0.743,0.224])(PROD([SOLIDIFY(hill),Q(.1)]))
+hill2Ddx = R([1,2])(PI)(hill2D)
+hill2D3 = R([1,2])(PI/2)(STRUCT ([hill2D,hill2Ddx]))
+hill2D4 = R([1,2])(SQRT(2)*PI/2)(STRUCT ([hill2D,hill2Ddx]))
+hill2D5 = R([1,2])(SQRT(2)*-PI/2)(STRUCT ([hill2D,hill2Ddx]))
+prato = STRUCT([hill2D,hill2Ddx,hill2D3, hill2D4, hill2D5])
+
+
+#hill3D = T(3)(-0.1)(STRUCT(NN(36)([hill2D,R([1,2])(PI/36)])))
+hillT = R([1,2])(PI/4)(hill2D)
+VIEW(hill2D)
+
+#recinto
+parall = T([1,2])([12.8,1.5])(CUBOID([.2,5.7,1]))
+perpen1 = T([1,2])([6.9,1.5])(CUBOID([6,.2,1]))
+perpen2 = T([1,2])([6.9,7])(CUBOID([6,.2,1]))
+
+recintodx = COLOR([0.95,0.90,0.87])(STRUCT([parall,perpen1,perpen2]))
+recintosx = COLOR([0.95,0.90,0.87])(T(2)(-8.7)(recintodx))
+recintoAnt = STRUCT([recintodx,recintosx])
+recintoPost = R([1,2])(PI)(recintoAnt)
 
 alaBACK_scale = STRUCT([alaBACK_complete,scale])
 palazzo_noBalconi = STRUCT([alaFRONT_complete,alaBACK_scale,pianerottolo,piano_back,tetto])
-VIEW(STRUCT([palazzo_noBalconi,stairs,finestre_scala,finestre_living, finestre_living_post, finestreRoom,finestreRoomBack,finestreBath, finestreBathBack, finestreBed, finestreBedBack]))
+VIEW(STRUCT([palazzo_noBalconi,stairs,finestre_scala,finestre_living, finestre_living_post, finestreRoom,finestreRoomBack,finestreBath, 
+	finestreBathBack, finestreBed, finestreBedBack, balconiAnt, balconiPost, portoneC, m_andr_sx,m_andr_dx, porte_tot, recintoAnt, recintoPost, prato]))
 
 
 
