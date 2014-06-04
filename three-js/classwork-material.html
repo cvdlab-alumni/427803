@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html>
+ <head> 
+  <title>Classwork 2 - Materials</title> 
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+    #stats {  /* Align stats top-left */
+      position: absolute;
+      left: 0px;
+      top: 0px;
+    }
+  </style> 
+  </head> 
+  <body>
+    <!-- JavaScript libraries -->
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r67/three.min.js"></script> 
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script> 
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/stats.js/r11/Stats.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5/dat.gui.min.js"></script>
+    <script src="assets/libs/TrackballControls.js"></script>
+    <!-- Javascript code that runs our Three.js examples --> 
+    <script>
+      
+      $(function () {
+
+        //----------------------------------------------------------------------------------------------
+        // UTILITY METHODS - everything that helps you writing nice code
+        //---------------------------------------------------------------------------------------------- 
+        function cubeLambertWithDir(){
+          var cubeGeometry = new THREE.BoxGeometry(10,10,10);
+          var cubeMaterial = new THREE.MeshLambertMaterial({color: 0x404040});
+          cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+          cube.position.set(-10,5,-10);
+          scene.add(cube)
+
+          pointColor = "#ff5808";
+          directionalLight = new THREE.DirectionalLight(pointColor);
+          directionalLight.position.set(0, 60, 0);
+          directionalLight.castShadow = true;
+          directionalLight.shadowCameraNear = 2;
+          directionalLight.shadowCameraFar = 50;
+          directionalLight.shadowCameraLeft = -20;
+          directionalLight.shadowCameraRight = 20;
+          directionalLight.shadowCameraTop = 20;
+          directionalLight.shadowCameraBottom = -20;
+
+          directionalLight.intensity = 10;
+          directionalLight.shadowMapHeight = 1024;
+          directionalLight.shadowMapWidth = 1024;
+
+
+          scene.add(directionalLight);
+
+          return cube;
+
+        }
+
+
+        function sphereLambertWithSpot(){
+        var sphereGeometry = new THREE.SphereGeometry(4, 20, 20);
+        var sphereMaterial = new THREE.MeshLambertMaterial({color: 0x7777ff});
+        var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+
+        // position the sphere
+        sphere.position.x = -5;
+        sphere.position.y = 4;
+        sphere.position.z = -5;
+        sphere.castShadow = true;
+
+        // add the sphere to the scene
+        scene.add(sphere);
+        spotLight = new THREE.SpotLight( 0x404040 ,30, 200, 30, 0.001);
+        spotLight.position.set(0,45,0);
+        scene.add(spotLight);
+
+        return sphere;
+
+
+        }
+
+
+        function toroPhogMaterialDir(){
+
+        
+        var geometry = new THREE.TorusGeometry( 10, 3, 16, 100 );
+        var material = new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x556de3, specular: 0x009900, shininess: 30, shading: THREE.FlatShading } );
+        var torus = new THREE.Mesh( geometry, material );
+        scene.add( torus );
+        torus.position.set(0, 6.5, 0);
+        
+        pointColor = "#ff5808";
+          directionalLight = new THREE.DirectionalLight(pointColor);
+          directionalLight.position.set(-10, 60, -10);
+          directionalLight.castShadow = true;
+          directionalLight.shadowCameraNear = 2;
+          directionalLight.shadowCameraFar = 50;
+          directionalLight.shadowCameraLeft = -20;
+          directionalLight.shadowCameraRight = 20;
+          directionalLight.shadowCameraTop = 20;
+          directionalLight.shadowCameraBottom = -20;
+
+          directionalLight.intensity = 10;
+          directionalLight.shadowMapHeight = 1024;
+          directionalLight.shadowMapWidth = 1024;
+          scene.add(directionalLight);
+
+
+
+          return torus;
+
+       }
+
+       function tetraPhogMaterialSpot(){
+
+        
+        var geometry = new THREE.TetrahedronGeometry(3, 10);
+        var material = new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading } );
+        var tetra = new THREE.Mesh(geometry, material);
+        scene.add(tetra);
+
+        tetra.position.set(0, 1.5, 0 );
+
+        spotLight = new THREE.SpotLight( 0x404040 ,20, 200, 30, 0.001);
+        spotLight.position.set(-10,45,-10);
+        scene.add(spotLight);
+
+        return tetra;
+
+      
+      }
+
+        //----------------------------------------------------------------------------------------------
+        // Initializing BASIC environment (STATS, SCENE, CAMERA, RENDER)
+        //----------------------------------------------------------------------------------------------
+        var stats = initStats();
+
+        var scene = new THREE.Scene();
+
+        var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
+
+
+        var renderer = new THREE.WebGLRenderer();
+
+
+
+        //----------------------------------------------------------------------------------------------
+        // AXIS SET UP
+        //----------------------------------------------------------------------------------------------
+        
+
+        //----------------------------------------------------------------------------------------------
+        // TRACKBALL SET UP
+        //----------------------------------------------------------------------------------------------        
+        var trackballControls = new THREE.TrackballControls(camera);
+
+
+        //----------------------------------------------------------------------------------------------
+        //  SCENE SET UP - Add your own meshes
+        //---------------------------------------------------------------------------------------------- 
+        renderer.setClearColor(new THREE.Color(0x99FFFF));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+
+       
+        // create the ground plane
+        var planeGeometry = new THREE.PlaneGeometry(50,50);
+        var planeMaterial = new THREE.MeshLambertMaterial({color: 0x00FF00, side: THREE.DoubleSide});
+        planeMaterial.side = THREE.DoubleSide;
+        var plane = new THREE.Mesh(planeGeometry,planeMaterial);
+        plane.rotation.x=-0.5*Math.PI;
+
+        // add the plane to the scene
+        scene.add(plane);
+        
+
+        
+      
+        var cubeView = cubeLambertWithDir();
+        var sphereView = sphereLambertWithSpot();
+
+        var toroView = toroPhogMaterialDir();
+        var tetraView = tetraPhogMaterialSpot();
+
+
+        
+
+
+
+        //----------------------------------------------------------------------------------------------
+        // CAMERAs SET UP  
+        //---------------------------------------------------------------------------------------------- 
+        camera.position.set(-100,40,30);
+        camera.up = new THREE.Vector3(0,1,0);
+        camera.lookAt(scene.position);
+
+      
+
+        //----------------------------------------------------------------------------------------------
+        // LIGHTS SET UP 
+        //---------------------------------------------------------------------------------------------- 
+      
+
+        
+
+        
+
+
+
+        //----------------------------------------------------------------------------------------------
+        // HELPER ELEMENTS SET UP 
+        //---------------------------------------------------------------------------------------------- 
+        //var spotLightHelper = new THREE.SpotLightHelper(spotLight);
+        //scene.add(spotLightHelper);
+
+        // add a small sphere simulating the pointlight
+        var sphereLight = new THREE.SphereGeometry(0.5);
+        var sphereLightMaterial = new THREE.MeshBasicMaterial({color: 0xac6c25});
+        var sphereLightMesh = new THREE.Mesh(sphereLight, sphereLightMaterial);
+        sphereLightMesh.castShadow = true;
+
+        sphereLightMesh.position = new THREE.Vector3(-40, 60, -40);
+        scene.add(sphereLightMesh);
+
+        // add axis helper
+        var axisHelper = new THREE.AxisHelper(3);
+        scene.add(axisHelper);
+
+
+        //----------------------------------------------------------------------------------------------
+        // APPEND THE RENDERER TO THE PAGE BODY
+        //---------------------------------------------------------------------------------------------- 
+        $('body').append(renderer.domElement);
+
+       
+
+        //----------------------------------------------------------------------------------------------
+        // CONTROLS FUNCTION SET UP - helper for the CONTROL PANEL
+        //---------------------------------------------------------------------------------------------- 
+        var controls = new function () {
+
+        this.showAxisHelper = true;
+        this.showCube = true;
+        this.showSphere = false;
+        this.showToro = false;
+        this.showTetra = false;
+
+          
+          /*ambientColor = ambiColor;
+          pointColor = pointColor;
+          intensity = 0.5;
+          debug = false;
+          castShadow = true;
+          onlyShadow = false;*/
+          
+      }
+
+        //----------------------------------------------------------------------------------------------
+        // SET UP GUI CONTROL - to manage which include in the panel
+        //---------------------------------------------------------------------------------------------- 
+        var gui = new dat.GUI();
+
+        var axis_control = gui.add(controls, 'showAxisHelper');
+
+        axis_control.onChange(function (value) {
+        axisHelper.visible = value;
+        });
+
+        var cube_control = gui.add(controls, 'showCube');
+
+        cube_control.onChange(function (value){
+          cubeView.visible = value;
+        });
+
+        var sphere_control = gui.add(controls, 'showSphere');
+
+        sphere_control.onChange(function (value){
+          sphereView.visible = value;
+        });
+
+        var toro_control = gui.add(controls, 'showToro');
+
+        toro_control.onChange(function (value){
+          toroView.visible = value;
+        });
+        
+        var tetra_control = gui.add(controls, 'showTetra');
+
+        tetra_control.onChange(function (value){
+          tetraView.visible = value;
+        });
+        
+          
+        
+        //----------------------------------------------------------------------------------------------
+        // UTILITY CODE - to start the render function and to call others methods
+        //----------------------------------------------------------------------------------------------
+
+        render();
+
+
+        //----------------------------------------------------------------------------------------------
+        // UI CHECK BOX SET UP - to manage which checkbox include in the panel
+        //---------------------------------------------------------------------------------------------- 
+
+
+        //----------------------------------------------------------------------------------------------
+        // RENDER FUNCTION - to manage the utility stats (left corner)
+        //----------------------------------------------------------------------------------------------    
+
+        function render(){
+          stats.update();
+          trackballControls.update();
+          
+          requestAnimationFrame(render);
+          renderer.render(scene, camera);
+
+        }     
+
+        //----------------------------------------------------------------------------------------------
+        // INITSTATS FUNCTION - to manage the utility stats (left corner)
+        //---------------------------------------------------------------------------------------------- 
+        function initStats() {
+          var stats = new Stats();
+          stats.setMode(0); // 0: fps, 1: ms
+          $('body').append(stats.domElement);
+          return stats;
+        }
+        
+
+        
+
+      });
+    </script>  
+ </body>
+</html>   
+</html>
