@@ -22,7 +22,9 @@
     <script src="http://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5/dat.gui.min.js"></script>
     <script src="assets/libs/TrackballControls.js"></script>
     <script src="assets/fonts/bignoodletitling_regular.typeface.js"></script>
-    <script src="../examples/assets/libs/tween.min.js"></script>
+    <script src="assets/libs/tween.min.js"></script>
+    <script src="assets/libs/keyframe.js"></script>
+
    
     <!-- Javascript code that runs our Three.js examples --> 
     <script>
@@ -259,7 +261,7 @@
 
 
         function pixarBall(){
-          var sphereGeometry = new THREE.SphereGeometry(5,20,20);
+          var sphereGeometry = new THREE.SphereGeometry(7,20,20);
           var sphereMaterial = new THREE.MeshPhongMaterial({color: 0x6633FF});
           var ball = new THREE.Mesh(sphereGeometry,sphereMaterial);
           return ball;
@@ -308,7 +310,6 @@
         //----------------------------------------------------------------------------------------------
         // TRACKBALL SET UP
         //----------------------------------------------------------------------------------------------        
-        var trackballControls = new THREE.TrackballControls(camera);
 
 
         //----------------------------------------------------------------------------------------------
@@ -318,7 +319,7 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
 
 
-        var w = 300;
+        var w = 600;
         var h = 300;
 
         // create the ground plane
@@ -389,7 +390,7 @@
         pixarLamp.castShadow = true;
         pixarLamp.scale.set(1.4,1.4,1.4);
         pixarLamp.position.x = 100;
-        pixarLamp.position.y = 100;
+        pixarLamp.position.y = 40;
 
         //Setting lamp rotation
         pivotFittizio.rotation.z = (Math.PI/3)*6;
@@ -404,14 +405,14 @@
         //Create the pixarBall
         var ball = pixarBall();
         ball.castShadow = true;
-        ball.position.set(20,20,4);
+        ball.position.set(-100,60,6);
         scene.add(ball);
 
 
       
         //Create text
         var text = createText();
-        text.position.y = 20;
+        text.position.y = -30;
         scene.add(text);
 
         
@@ -439,7 +440,7 @@
         //----------------------------------------------------------------------------------------------
         // CAMERAs SET UP  
         //---------------------------------------------------------------------------------------------- 
-        camera.position.set(0,-150,28);
+        camera.position.set(0,-180,20);
         camera.up = new THREE.Vector3(0,0,1);
         camera.lookAt(scene.position);
 
@@ -496,14 +497,9 @@
         spotLightText.shadow;
 
         
-        var sphereLightMesh3 = lightHelper();
-        sphereLightMesh3.position = spotLightText.position
-        
-        scene.add(sphereLightMesh3);
         var targText = new THREE.Object3D;
         targText.position.set(0,100,20);
         spotLightText.target = targText;
-        spotLightText.shadowCameraVisible = true;
 
         scene.add(spotLightText);
 
@@ -594,10 +590,17 @@
 
         if(value === false){
         var offColor = {color: 0xDDDDDD};
-        lamp.material.setValues(offColor);}
+        lamp.material.setValues(offColor);
+        renderer.clearTarget(lamp.children[0].shadowMap);
+        lamp.children[0].castShadow = false;
+      }
         else {
           var onColor = {color: 0xFFFF99};
         lamp.material.setValues(onColor);
+        renderer.clearTarget(lamp.children[0].shadowMap);
+        lamp.children[0].castShadow = true;
+
+
         }
         });
 
@@ -608,25 +611,84 @@
          gui.add(controls, 'Yposition', -10 , 10).onChange(function (e) {
                     pixarLamp.position.y = 10*e;
         });
+
+         //----------------------------------------------------------------------------------------------
+        // ANIMATION 
+        //---------------------------------------------------------------------------------------------- 
+            //define animations
+           var animator = null;
+           var duration = 3; // sec
+           var loopAnimationT = true;
+           var loopAnimationF = false;
+
+            function initAnimator() {
+              animator = new KF.KeyFrameAnimator();
+              animator.init({ 
+          interps:
+            [
+              { 
+                keys:[0, .2, .4, .6, .8, 1], 
+                values:[
+                  { x : 80},
+                  { x: 60 },
+                  { x: 40  },
+                  { x: 20 },
+                  { x: 10 },
+                  { x: 5 },
+                ],
+                target: pixarLamp.position
+              },
+              { 
+                keys:[0, .2, .4,.6, .8, 1], 
+                values:[
+                  { z : 5 },
+                  { z : 0 },
+                  { z : 5 },
+                  { z : 0 },
+                  { z : 5 },
+                  { z : 0 },
+                ],
+                target: pixarLamp.position
+              },
+              {keys:[0, .2, .25,.3, .8, 1], 
+                values:[
+                  { z : 0 },
+                  { z : 0 },
+                  { z : 0 },
+                  { z : -Math.PI/2 },
+                  { z : 0 },
+                  { z : 0 },
+                ],
+                target: pivotFittizio.rotation
+              },
+            ],
+          loop: loopAnimationF,
+          duration: duration * 1000,
+          easing: TWEEN.Easing.Quadratic.In
+        });
+      }
+
+      
+          initAnimator();
+
+             
         
         //----------------------------------------------------------------------------------------------
         // UTILITY CODE - to start the render function and to call others methods
         //----------------------------------------------------------------------------------------------
 
         render();
+        animator.start();
 
 
-        //----------------------------------------------------------------------------------------------
-        // UI CHECK BOX SET UP - to manage which checkbox include in the panel
-        //---------------------------------------------------------------------------------------------- 
-        
-        
+       
         //----------------------------------------------------------------------------------------------
         // RENDER FUNCTION - to manage RENDERING,ANIMATIONS, UTILITIES ETC 
         //---------------------------------------------------------------------------------------------- 
         function render() {
           stats.update();
-          trackballControls.update();
+          KF.update();
+
 
          
           requestAnimationFrame(render);
