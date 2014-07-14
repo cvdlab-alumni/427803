@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html>
+ <head> 
+  <title>FINAL PROJECT</title> 
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+    #stats {  /* Align stats top-left */
+      position: absolute;
+      left: 0px;
+      top: 0px;
+    }
+    #video {
+      display: none; 
+      position: absolute; 
+      left 10px: 15px; 
+      bottom: 10px;
+    }
+    #blocker {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+      }
+
+      #instructions {
+        width: 100%;
+        height: 100%;
+
+        display: -webkit-box;
+        display: -moz-box;
+        display: box;
+
+        -webkit-box-orient: horizontal;
+        -moz-box-orient: horizontal;
+        box-orient: horizontal;
+
+        -webkit-box-pack: center;
+        -moz-box-pack: center;
+        box-pack: center;
+
+        -webkit-box-align: center;
+        -moz-box-align: center;
+        box-align: center;
+
+        color: #ffffff;
+        text-align: center;
+        cursor: pointer;
+      }
+
+  </style> 
+  </head> 
+  <body>
+  <video id="video" src="assets/movies/sintel.ogv" controls="true" autoplay="false"></video> 
+
+    <!-- JavaScript libraries -->
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script> 
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r67/three.min.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/stats.js/r11/Stats.min.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5/dat.gui.min.js"></script>
+  <script src="assets/libs/TrackballControls.js"></script>
+  <script src="assets/libs/OBJLoader.js"></script>
+  <script src="assets/libs/THREEx.KeyboardState.js"></script>
+  <script src="assets/libs/OBJMTLLoader.js"></script>
+  <script src="assets/libs/MTLLoader.js"></script>
+  <script src="assets/libs/ImportOBJMTL.js"></script>
+  <script src="doors-windows.js"></script>
+  <script src="furnitures.js"></script>
+  <script src="living_room.js"></script>
+  <script src="bedroom.js"></script>
+  <script src="bath.js"></script>
+  <script src="assets/libs/FirstPersonControls.js"></script>
+  <script src="assets/libs/PointerLockControls.js"></script>
+
+
+
+
+
+
+
+<!-- Code to display an information button and box when clicked. -->
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+<link rel=stylesheet href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
+<link rel=stylesheet href="css/info.css"/>
+<script src="js/info.js"></script>
+<div id="infoButton"></div>
+<div id="infoBox" title="Demo Information">
+This is the FINAL PROJECT of Cristoforo Parrotta/</a>
+</div>
+<div id="blocker">
+
+      <div id="instructions">
+        <span style="font-size:40px">Click to play</span>
+        <br />
+        (W, A, S, D = Move, SPACE = Jump, MOUSE = Look around)
+      </div>
+
+    </div>
+
+    <script>
+
+        var camera, scene, renderer,apt;
+
+        var controls;
+
+        var objects = [];
+
+        var ray;
+
+        var blocker = document.getElementById( 'blocker' );
+        var instructions = document.getElementById( 'instructions' );
+
+      // http://www.html5rocks.com/en/tutorials/pointerlock/intro/
+
+        var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
+
+        if ( havePointerLock ) {
+        var element = document.body;
+        var pointerlockchange = function ( event ) {
+
+          if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element ) {
+            controls.enabled = true;
+            blocker.style.display = 'none';
+          } else {
+            controls.enabled = false;
+            blocker.style.display = '-webkit-box';
+            blocker.style.display = '-moz-box';
+            blocker.style.display = 'box';
+            instructions.style.display = '';
+          }
+        }
+
+        var pointerlockerror = function ( event ) {
+          instructions.style.display = '';
+        }
+
+        // Hook pointer lock state change events
+        document.addEventListener( 'pointerlockchange', pointerlockchange, false );
+        document.addEventListener( 'mozpointerlockchange', pointerlockchange, false );
+        document.addEventListener( 'webkitpointerlockchange', pointerlockchange, false );
+
+        document.addEventListener( 'pointerlockerror', pointerlockerror, false );
+        document.addEventListener( 'mozpointerlockerror', pointerlockerror, false );
+        document.addEventListener( 'webkitpointerlockerror', pointerlockerror, false );
+
+        instructions.addEventListener( 'click', function ( event ) {
+          instructions.style.display = 'none';
+
+          // Ask the browser to lock the pointer
+          element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
+
+          if ( /Firefox/i.test( navigator.userAgent ) ) {
+            var fullscreenchange = function ( event ) {
+
+              if ( document.fullscreenElement === element || document.mozFullscreenElement === element || document.mozFullScreenElement === element ) {
+                document.removeEventListener( 'fullscreenchange', fullscreenchange );
+                document.removeEventListener( 'mozfullscreenchange', fullscreenchange );
+                element.requestPointerLock();
+              }
+            }
+
+            document.addEventListener( 'fullscreenchange', fullscreenchange, false );
+            document.addEventListener( 'mozfullscreenchange', fullscreenchange, false );
+
+            element.requestFullscreen = element.requestFullscreen || element.mozRequestFullscreen || element.mozRequestFullScreen || element.webkitRequestFullscreen;
+            element.requestFullscreen();
+
+          } else {
+            element.requestPointerLock();
+          }
+        }, false );
+      } else {
+        instructions.innerHTML = 'Your browser doesn\'t seem to support Pointer Lock API';
+      }
+
+        init();
+        animate();
+
+   
+
+      function init() {
+        //----------------------------------------------------------------------------------------------
+        // UTILITY CODE - to start the render function and to call others methods
+        //----------------------------------------------------------------------------------------------
+        var renderCamera = camera;
+        var apartment = new THREE.Object3D();
+
+
+         var loader = new THREE.OBJLoader();
+        loader.load('assets/models/apartment_adv.obj', function (obj) {
+
+        global_o = obj;
+
+         var material = new THREE.MeshLambertMaterial({color: 0xafafaf, side: THREE.DoubleSide, shading: THREE.FlatShading});
+        // material.side = THREE.DoubleSide;
+        // obj.children[0].material = material;
+        // mesh = obj.children[0];
+
+        var multiMaterial = [
+          new THREE.MeshLambertMaterial({color: 0xaaaaaa, side: THREE.DoubleSide, shading: THREE.FlatShading}),
+          new THREE.MeshBasicMaterial({wireframe: false, overdraw: true, color: 0xffffff, side: THREE.DoubleSide})
+          ];
+
+        mesh = new THREE.Mesh(obj.children[0].geometry, material);
+
+        mesh.scale.set(10,10,10);
+        //mesh.position.set(-40,-20,0);
+
+        //mesh.rotation.x = -Math.PI/2;  
+        apartment.add(mesh);
+        scene.add(apartment);
+
+
+      });
+
+        //----------------------------------------------------------------------------------------------
+        // UTILITY METHODS - everything that helps you writing nice code
+        //---------------------------------------------------------------------------------------------- 
+   
+
+        function createFloorTexture (height, weight){
+            var planeGeometry = new THREE.PlaneGeometry(weight,height,weight, height);
+            var planeMaterial = new THREE.MeshLambertMaterial({ ambient: 0xFFFFff,
+            specular: 0xffffff, shininess: 10, shading: THREE.SmoothShading });
+            //var plane = new THREE.Mesh(planeGeometry,planeMaterial);
+
+            var plane = createMesh(planeGeometry, "floor-wood.jpg");
+
+            return plane;
+
+        }
+
+
+        function createApt (){
+             var loader = new THREE.OBJLoader();
+             var mesh;
+        loader.load('assets/models/apartment_adv.obj', function (obj) {
+
+        global_o = obj;
+
+         var material = new THREE.MeshLambertMaterial({color: 0xafafaf, side: THREE.DoubleSide, shading: THREE.FlatShading});
+        // material.side = THREE.DoubleSide;
+        // obj.children[0].material = material;
+        // mesh = obj.children[0];
+
+        var multiMaterial = [
+          new THREE.MeshLambertMaterial({color: 0xaaaaaa, side: THREE.DoubleSide, shading: THREE.FlatShading}),
+          new THREE.MeshBasicMaterial({wireframe: false, overdraw: true, color: 0xffffff, side: THREE.DoubleSide})
+          ];
+
+        mesh = new THREE.Mesh(obj.children[0].geometry, material);
+
+        mesh.scale.set(10,10,10);
+        //mesh.position.set(-40,-20,0);
+
+          
+        //scene.add(mesh);
+
+      });
+
+    }
+
+
+      
+
+
+        //----------------------------------------------------------------------------------------------
+        // Initializing BASIC environment (STATS, SCENE, CAMERA, RENDER)
+        //----------------------------------------------------------------------------------------------
+        //var stats = initStats();
+
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
+        camera.position.set(0,0,5);
+        //camera.up = new THREE.Vector3(1,0,0);
+        //camera.down = new THREE.Vector3(-1,0,0);
+        //camera.lookAt(new THREE.Vector3(3,0,2.95));
+        controls = new THREE.PointerLockControls( camera );
+
+
+        //var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
+
+        var inspectedCamera = new THREE.PerspectiveCamera(10, window.innerWidth / window.innerHeight, 1, 10);
+
+
+        renderer = new THREE.WebGLRenderer();
+            //render.shadowMapEnabled = true;
+
+        //----------------------------------------------------------------------------------------------
+        // FP CONTROL
+        //----------------------------------------------------------------------------------------------
+        scene.add( controls.getObject() );
+
+        ray = new THREE.Raycaster();
+        ray.ray.direction.set( 0, -1, 0 );
+
+
+        //----------------------------------------------------------------------------------------------
+        // AXIS SET UP
+        //----------------------------------------------------------------------------------------------
+        var axisHelper = new THREE.AxisHelper(3);
+        scene.add(axisHelper);
+
+        //----------------------------------------------------------------------------------------------
+        // TRACKBALL SET UP
+        //----------------------------------------------------------------------------------------------        
+        var trackballControls = new THREE.TrackballControls(camera);
+
+
+        //----------------------------------------------------------------------------------------------
+        //  SCENE SET UP - Add your own meshes
+        //---------------------------------------------------------------------------------------------- 
+
+       
+        renderer.setClearColor(new THREE.Color(0xEEEEEE));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        //Floor Parquet
+        var entranceFloor = createFloorTextureExt(106,63, [0,13,3.01]);
+        var entranceFloorLiving = createFloorTextureExt(10,45, [20,3,3.01]);
+
+
+        entranceFloor.material.map.wrapT = THREE.RepeatWrapping;
+        entranceFloor.material.map.wrapS = THREE.RepeatWrapping; 
+        entranceFloorLiving.material.map.wrapT = THREE.RepeatWrapping;
+        entranceFloorLiving.material.map.wrapS = THREE.RepeatWrapping;   
+   
+
+        entranceFloor.material.map.repeat.set(3,5.4);
+        entranceFloorLiving.material.map.repeat.set(1.8,.6);
+        apartment.add(entranceFloor);
+       apartment.add(entranceFloorLiving);
+
+        //scene.add(entranceFloor);
+        //scene.add(entranceFloorLiving);
+
+         //SKYBOX
+        var skyBoxGeometry = new THREE.CubeGeometry( 10000, 10000, 10000 );
+        var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x9999ff, side: THREE.BackSide } );
+        var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
+        scene.add(skyBox);
+
+        
+
+
+        //Picture
+        var vivaLaVida = createPicture(30,25,[3.02,80,20]);
+        vivaLaVida.rotation.z = Math.PI/2;
+        vivaLaVida.rotation.y = Math.PI/2;
+        vivaLaVida.scale.set(0.6,.6,1.1);
+        apartment.add(vivaLaVida);
+        //scene.add(vivaLaVida);
+
+
+        //////////
+        // WALL //
+        //////////
+
+        //Bath Wall left
+        var bathWall = createBathWall (30, 44, [45,87.99,15]);
+        bathWall.material.map.wrapT = THREE.RepeatWrapping;
+        bathWall.material.map.wrapS = THREE.RepeatWrapping;
+        bathWall.material.map.repeat.set(1,1);
+        
+        bathWall.rotation.x = Math.PI/2;
+
+        //Bath Wall right
+        var bathWallR = createBathWall (30, 44, [45,70.51,15]);
+        bathWallR.material.map.wrapT = THREE.RepeatWrapping;
+        bathWallR.material.map.wrapS = THREE.RepeatWrapping;
+        bathWallR.material.map.repeat.set(1,1);
+        
+        bathWallR.rotation.x = Math.PI*(3/2);
+
+        //Bath Wall WINDOW
+        var bathWallW = createBathFloor (9.5, 30, [47.99,69.6,15]);
+        bathWallW.material.map.wrapT = THREE.RepeatWrapping;
+        bathWallW.material.map.wrapS = THREE.RepeatWrapping;
+        bathWallW.material.map.repeat.set(.5,.5);
+        
+        bathWallW.rotation.y = Math.PI*(3/2);
+
+        var bathWallW2 = createBathFloor (4, 30, [47.99,84,15]);
+        //bathWallW.material.map.wrapT = THREE.RepeatWrapping;
+        //bathWallW.material.map.wrapS = THREE.RepeatWrapping;
+        bathWallW2.material.map.repeat.set(.25,.25);
+
+        bathWallW2.rotation.y = Math.PI*(3/2);
+
+        var bathWallW3Bottom = createBathFloor (5, 10, [57.99,79,8]);
+        bathWallW3Bottom.material.map.repeat.set(.25,.25);
+
+        bathWallW3Bottom.rotation.y = Math.PI*(3/2);
+
+        var bathWallW3Up = createBathFloor (5, 5, [60.49,79,27.5]);
+        //bathWallW.material.map.wrapT = THREE.RepeatWrapping;
+        //bathWallW.material.map.wrapS = THREE.RepeatWrapping;
+        bathWallW3Up.material.map.repeat.set(.25,.25);
+
+        bathWallW3Up.rotation.y = Math.PI*(3/2);
+
+
+        //General Wall
+        var entranceWall = createGeneralWall(27,107, [3.01,67,16.5]);
+        entranceWall.rotation.z = Math.PI/2;
+        entranceWall.rotation.y = Math.PI/2;
+        entranceWall.material.map.wrapT = THREE.RepeatWrapping;
+        entranceWall.material.map.wrapS = THREE.RepeatWrapping; 
+        entranceWall.material.map.repeat.set(1,1);
+
+        apartment.add(entranceWall);
+        //scene.add(entranceWall);
+
+        //Door Wall
+        var doorWall = createDoorWall([22.99,49,3]);
+        //doorWall.material.map.wrapT = THREE.RepeatWrapping;
+        //doorWall.material.map.wrapS = THREE.RepeatWrapping; 
+        //doorWall.material.map.repeat.set(1,1);
+        //doorWall.rotation.z = Math.PI/2;
+        //doorWall.rotation.y = -Math.PI/2;
+
+        apartment.add(doorWall);
+
+        //scene.add(doorWall);
+
+        //Kitchen Wall
+        var kitchenWall = createKitchenWall(43.5,28,[44.7,48.48,16]);
+        kitchenWall.rotation.x = Math.PI/2;
+        kitchenWall.rotation.z = Math.PI/2
+        kitchenWall.material.map.wrapT = THREE.RepeatWrapping;
+        kitchenWall.material.map.wrapS = THREE.RepeatWrapping; 
+
+        
+        apartment.add(kitchenWall);
+
+        //scene.add(kitchenWall);
+
+        //Big WIndow Wall
+        var bigWindowWall = createWindowsWall([65.99,3,0]);
+        
+        apartment.add(bigWindowWall);
+
+        //scene.add(bigWindowWall);
+
+        //Living Wall
+        var livingWall = createLivingWall (30, 44, [45,3.01,15]);
+        livingWall.material.map.wrapT = THREE.RepeatWrapping;
+        livingWall.material.map.wrapS = THREE.RepeatWrapping;
+        livingWall.material.map.repeat.set(1,1);
+        
+        livingWall.rotation.x = Math.PI*(3/2);
+        var livingDown = createLivingWall (30, 13, [26.01,9.3,15]);
+        livingDown.rotation.z = Math.PI/2;
+        livingDown.rotation.y = Math.PI/2;
+
+        apartment.add(livingWall);
+        apartment.add(livingDown);
+        //scene.add(livingWall);
+        //scene.add(livingDown);
+
+        ///////////
+        // DOORS //
+        ///////////
+
+        //ENTRY DOOR
+        var door = createEntryDoor (17, [3,13.7,14]);
+
+        //First Room Door
+        var roomDoor = createStandardDoor(10, [23.5,64.5,14]);
+
+        //Bath Room Door
+        var bathDoor = createStandardDoor(9.3, [23.5,86.4,14]);
+
+        //Bedroom Room Door
+        var bedDoor = createStandardDoor(10, [23.5,109.02,14]);
+
+        /////////////
+        // WINDOWs //
+        /////////////
+
+        var livingWindow = createWindow(17, [65.2, 33.5, 2.3]);
+        livingWindow.scale.set(1.5,1.63,3);
+
+        var roomWindow = createWindow(17, [65.2, 62.5, 2.35]);
+        roomWindow.scale.set(1.32,1.6,3);
+
+        var bathWindow = createWindow(17, [66.5, 83.5, 13]);
+        bathWindow.scale.set(.88,1,.3);
+
+        var bedWindow = createWindow(17, [66.5, 104, 13]);
+        bedWindow.scale.set(1.4,1,.5);
+
+
+
+       //BATH FLOOR
+       var bathFloor = createBathFloor (41, 19, [33, 59, 3.02]);
+       bathFloor.rotation.z = Math.PI/2;
+
+        bathFloor.material.map.wrapT = THREE.RepeatWrapping;
+        bathFloor.material.map.wrapS = THREE.RepeatWrapping;
+
+        apartment.add(bathFloor);
+        apartment.add(bathWall);
+        apartment.add(bathWallR);
+        apartment.add(bathWallW);
+        apartment.add(bathWallW2);
+        apartment.add(bathWallW3Bottom);
+        apartment.add(bathWallW3Up);
+        apartment.add(door);
+        apartment.add(roomDoor);
+        apartment.add(bathDoor);
+        apartment.add(bedDoor);
+        apartment.add(livingWindow);
+        apartment.add(roomWindow);
+        apartment.add(bathWindow);
+        apartment.add(bedWindow);
+        //scene.add(bathFloor);
+        //scene.add(bathWall);
+        //scene.add(bathWallR);
+        //scene.add(bathWallW);
+        //scene.add(bathWallW2);
+        //scene.add(bathWallW3Bottom);
+        //scene.add(bathWallW3Up);
+        //scene.add(door);
+        //scene.add(roomDoor);
+        //scene.add(bathDoor);
+        //scene.add(bedDoor);
+        //scene.add(livingWindow);
+        //scene.add(roomWindow);
+        //scene.add(bathWindow)
+        //scene.add(bedWindow);
+
+
+
+        /////////////
+        // LIVING //
+        /////////////
+
+        //TV
+        var tv = createTV([30, 10, 14]);
+        tv.rotation.y = -Math.PI/3+Math.PI;
+        apartment.add(tv);
+        //scene.add(tv);
+
+        //LAMP
+        var lamp = createLamp([63, 6, 3]);
+        lamp.rotation.y = -Math.PI;
+        apartment.add(lamp);
+        //scene.add(lamp);
+
+        //SOFA
+        var sofa = createSofa([47, 9, 8]);
+        apartment.add(sofa);
+        //scene.add(sofa);
+
+        //TV STAND
+        var tvStand = createTvStand([31.4, 10, 3]);
+        apartment.add(tvStand);
+        //scene.add(tvStand);
+
+        //TABLE 
+        var table = createTable([46, 27, 3]);
+        apartment.add(table);
+
+        //scene.add(table);
+        var chairT = createChair ([43, 28, 2.9]);
+        apartment.add(chairT);
+
+        //scene.add(chairT);
+        var chairT1 = createChair ([51, 30, 2.9]);
+        chairT1.rotation.y = -Math.PI/2;
+        apartment.add(chairT1);
+        //scene.add(chairT1);
+
+
+        //KITCHEN
+        var kitchen = createKitchen([56, 48.5, 3]);
+        
+        apartment.add(kitchen);
+
+        //scene.add(kitchen);
+
+        //Fridge
+        var fridge = createFridge([35.8, 48.5, 3]);
+        
+        apartment.add(fridge);
+
+        //scene.add(fridge);
+
+       
+        /////////////
+        // ROOM   //
+        /////////////
+        var bed = createSingleBed([0, 30, 3]);
+        bed.rotation.y = Math.PI/2;
+        apartment.add(bed);
+        //scene.add(bed);
+
+        var mobile = createArmadio([76, 55, 3]);
+        mobile.rotation.y = Math.PI;
+        apartment.add(mobile);
+        //scene.add(mobile);
+
+        var desk = createDesk([0, 0, 0]);
+        apartment.add(desk);
+        //scene.add(desk);
+
+        /////////////
+        // BATH   //
+        /////////////
+        var wc = createWc([60, 75, 3]);
+        wc.rotation.y = -Math.PI/2;
+         apartment.add(wc);
+        //scene.add(wc);
+
+        var lavabo = createLavabo([50, 73, 3]);
+        lavabo.rotation.y = Math.PI;
+        apartment.add(lavabo);
+        //scene.add(lavabo);
+
+        var shower = createShower([26,106.5,3]);
+        shower.rotation.y = Math.PI*(3/2);
+        apartment.add(shower);
+        //scene.add(shower);
+
+
+        /////////////
+        // BEDROOM //
+        /////////////
+        var dbed = createDoubleBed([47,120,3]);
+        dbed.rotation.y = Math.PI*2;
+        apartment.add(dbed);
+        //scene.add(dbed);
+
+        var samsung = createSamsung([60, 66, 2.9]);
+        samsung.rotation.y = -Math.PI/2;
+        apartment.add(samsung);
+        //scene.add(samsung);
+
+
+        var pc = createMac([60, 64, 11]);
+        apartment.add(pc);
+        //scene.add(pc);
+
+        var chair = createChair ([60, 64, 2.9]);
+        chair.rotation.y = Math.PI;
+        apartment.add(chair);
+        //scene.add(chair);
+        apartment.rotation.x = -Math.PI/2;
+
+
+
+
+
+
+       
+
+
+        //----------------------------------------------------------------------------------------------
+        // CAMERAs SET UP  
+        //---------------------------------------------------------------------------------------------- 
+        //camera.position.set(-100,50,50);
+        //camera.up = new THREE.Vector3(0,0,1);
+        //camera.lookAt(new THREE.Vector3(40,30,2.95));
+
+        //camera.position.set(3,-10,3.3);
+        //camera.up = new THREE.Vector3(1,1,0);
+        //camera.lookAt(new THREE.Vector3(3,0,2.95));
+
+        
+        //----------------------------------------------------------------------------------------------
+        // LIGHTS SET UP 
+        //---------------------------------------------------------------------------------------------- 
+        //POINT LIGHT
+          var pointColor = "#FFFFFF";
+          var directionalLight = new THREE.DirectionalLight(pointColor);
+          directionalLight.position.set(0, 0, 200);
+          directionalLight.shadowCameraNear = 2;
+          directionalLight.shadowCameraFar = 200;
+          directionalLight.shadowCameraLeft = -50;
+          directionalLight.shadowCameraRight = 50;
+          directionalLight.shadowCameraTop = 50;
+          directionalLight.shadowCameraBottom = -50;
+
+          //directionalLight.distance = 0;
+          directionalLight.intensity = 1;
+          directionalLight.shadowMapHeight = 1024;
+          directionalLight.shadowMapWidth = 1024;
+
+
+         // scene.add(directionalLight);
+
+
+
+        var spotLight1 = new THREE.SpotLight(0xffffff);
+        spotLight1.position.set(-30, 200, 100);
+        spotLight1.intensity = .5;
+        scene.add(spotLight1);
+
+        var spotLight2 = new THREE.SpotLight(0xffffff);
+        spotLight2.position.set(30, -200, 100);
+        spotLight2.intensity = 1;
+        scene.add(spotLight2);
+
+
+
+
+        //----------------------------------------------------------------------------------------------
+        // HELPER ELEMENTS SET UP 
+        //---------------------------------------------------------------------------------------------- 
+        var cameraHelper = new THREE.CameraHelper(inspectedCamera);
+        scene.add(inspectedCamera);
+        scene.add(cameraHelper);
+
+        //Ambient Light HELPER
+        var sphereSize = 1;
+        var directionalLightHelper = new THREE.DirectionalLightHelper( directionalLight, sphereSize );
+        //scene.add( directionalLightHelper );
+
+        //SpotLight HELPER
+        var sphereSize2 = 2;
+        var spotLightHelper = new THREE.SpotLightHelper( spotLight1, sphereSize2 );
+        scene.add(spotLightHelper );
+
+        //SpotLight HELPER
+        var sphereSize3 = 2;
+        var spotLightHelper2 = new THREE.SpotLightHelper( spotLight2, sphereSize3 );
+        scene.add(spotLightHelper2 );
+
+        //----------------------------------------------------------------------------------------------
+        // APPEND THE RENDERER TO THE PAGE BODY
+        //---------------------------------------------------------------------------------------------- 
+        $('body').append(renderer.domElement);
+
+
+        //----------------------------------------------------------------------------------------------
+        // CONTROLS FUNCTION SET UP - helper for the CONTROL PANEL
+        //---------------------------------------------------------------------------------------------- 
+        var controlsSet = new function () {
+            this.showAxisHelper = true;
+            this.openEntryDoor = 0;
+            this.openRoomDoor = 0;
+            this.openBathDoor = 0;
+            this.openBedRoom = 0;
+            this.showVideo = false;
+
+          this.showCanvas = function () {
+            if (controlsSet.showVideo) {
+              $video.show();
+            } else {
+              $video.hide();
+            }
+          }
+
+          
+        };
+
+        //----------------------------------------------------------------------------------------------
+        // SET UP GUI CONTROL - to manage which include in the panel
+        //---------------------------------------------------------------------------------------------- 
+        var gui = new dat.GUI();
+        
+
+
+        //CHECK BOX
+        var axisControl = gui.add(controlsSet, 'showAxisHelper');
+        var rotationControl = gui.add(controlsSet, 'openEntryDoor', 0, 2);
+        var rotationRoomControl = gui.add(controlsSet, 'openRoomDoor', 0, 2);
+        var rotationBathControl = gui.add(controlsSet, 'openBathDoor', 0, 2);
+        var rotationBedRoomControl = gui.add(controlsSet, 'openBedRoom', 0, 2);
+        gui.add(controlsSet, "showVideo").onChange(controlsSet.showCanvas);
+
+
+
+        
+        
+
+        //animate();
+
+
+        //----------------------------------------------------------------------------------------------
+        // UI CHECK BOX SET UP - to manage which checkbox include in the panel
+        //---------------------------------------------------------------------------------------------- 
+        axisControl.onChange(function (value) {
+        axisHelper.visible = value;
+        });
+        rotationControl.onChange(function (e) {
+                    door.rotation.z = ((Math.PI/2)*e)/2;
+        });
+        rotationRoomControl.onChange(function (e) {
+                    roomDoor.rotation.z = -((Math.PI/2)*e)/2;
+        });
+        rotationBathControl.onChange(function (e) {
+                    bathDoor.rotation.z = -((Math.PI/2)*e)/2;
+        });
+        rotationBedRoomControl.onChange(function (e) {
+                    bedDoor.rotation.z = -((Math.PI/2)*e)/2;
+        });
+        
+
+       }
+
+        //----------------------------------------------------------------------------------------------
+        // RENDER FUNCTION - to manage RENDERING,ANIMATIONS, UTILITIES ETC 
+        //---------------------------------------------------------------------------------------------- 
+        function animate() {
+          //stats.update();
+          //trackballControls.update();
+
+          if (video.readyState === video.HAVE_ENOUGH_DATA) {
+              if (texture) texture.needsUpdate = true;
+          }
+          requestAnimationFrame( animate );
+          //ray.ray.origin.copy( controls.getObject().position );
+          //ray.ray.origin.y -= 10;
+          var intersections = ray.intersectObjects( objects );
+          if ( intersections.length > 0 ) {
+          var distance = intersections[ 0 ].distance;
+          
+        }
+
+        controls.update();
+        renderer.render( scene, camera );
+        //controls.update();
+      
+
+
+          //renderer.setClearColor = new THREE.Color(controls.colorScene);
+
+
+         //requestAnimationFrame(render);
+        //renderer.render(scene, renderCamera);
+
+        }
+
+        //----------------------------------------------------------------------------------------------
+        // INITSTATS FUNCTION - to manage the utility stats (left corner)
+        //---------------------------------------------------------------------------------------------- 
+        function initStats() {
+          var stats = new Stats();
+          stats.setMode(0); // 0: fps, 1: ms
+          $('body').append(stats.domElement);
+          return stats;
+        }
+        
+
+        
+      
+      
+    </script>  
+ </body>
+</html>

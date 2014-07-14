@@ -36,7 +36,7 @@ master = V,[cell for k,cell in enumerate(CV) if not (k in toRemove)]
 
 hpc = SKEL_1(STRUCT(MKPOLS(master)))
 hpc = cellNumbering (master,hpc)(range(len(master[1])),RED,1)
-#VIEW(hpc)
+VIEW(hpc)
 
 
 #CREAZIONE PORTE E FINESTRE NELLE PARETI
@@ -90,6 +90,7 @@ master = diagram2cell(diagram,master,98)
 hpc = SKEL_1(STRUCT(MKPOLS(master)))
 hpc = cellNumbering (master,hpc)(range(len(master[1])),RED,1)
 #VIEW(hpc)
+
 #finestra1 bagno (cella 111)
 diagram = assemblyDiagramInit([1,3,3])([[.3],[.625,.7,.625],[1,1.4,.3]])
 master = diagram2cell(diagram,master,105)
