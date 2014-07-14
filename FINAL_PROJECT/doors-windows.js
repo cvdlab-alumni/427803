@@ -58,11 +58,9 @@
  function createEntryDoor (weight, position){
             var doorGeometry = new THREE.BoxGeometry(weight,22,1.4);
             var doorGeometryB = new THREE.BoxGeometry(weight, 22, 0.1);
-           
+            var isClosed = true;
             var door = createMesh(doorGeometry, "entry-door.jpg", "entry-door-bump.jpg", 0.1);
             var doorB = createMesh(doorGeometryB, "entry-door-back2.jpg", "entry-door-back-bump.jpg", 0.1);
-
-            
 
             door.rotation.x = Math.PI/2;
             doorB.rotation.x = Math.PI;
@@ -77,11 +75,32 @@
             joint.add(door);
             joint.position.set(position[0],position[1],position[2]);
 
+            door.interact = function(){
+               if(!isClosed){
+                       if (reverse===1){
+                               new TWEEN.Tween(joint.rotation)
+                               .to({z: -Math.PI/2},1000)
+                               .start();
+                       } else {
+                               new TWEEN.Tween(joint.rotation)
+                               .to({z: Math.PI/2},1000)
+                               .start();
+                       }
+                       
+                       isClosed=true;
+               } else {
+                       new TWEEN.Tween(joint.rotation)
+                       .to({z: 0},1000)
+                       .start();
+                       isClosed=false;
+               }
 
-            return joint;
 
 
  }
+             return joint;
+
+}
 
 
  function createStandardDoor (weight, position){
