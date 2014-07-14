@@ -6,7 +6,7 @@ function createPicture (w,h, position){
            specular: 0xffffff, shininess: 10, shading: THREE.SmoothShading });
       //var plane = new THREE.Mesh(planeGeometry,planeMaterial);
 
-      var planeTexture = createMesh(new THREE.PlaneGeometry(w, h), "quadro.png", "cornice-bump.png");
+      var planeTexture = createMesh(new THREE.PlaneGeometry(w, h), "quadro.png", "cornice-bump.png", 0.9);
 
       planeTexture.position.set(position[0], position[1], position[2]);
 

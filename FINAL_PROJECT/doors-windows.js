@@ -1,19 +1,52 @@
-     function createMesh(geom, imageFile, bump, scale) {
-            var texture = THREE.ImageUtils.loadTexture("assets/textures/general/" + imageFile)
-            geom.computeVertexNormals();
-            var mat = new THREE.MeshPhongMaterial();
-            mat.map = texture;
+     //function createMesh(geom, imageFile, bump, scale) {
+       //     var texture = THREE.ImageUtils.loadTexture("assets/textures/general/" + imageFile)
+       //     geom.computeVertexNormals();
+       //     var mat = new THREE.MeshPhongMaterial();
+       //     mat.map = texture;
 
-            if (bump&&scale) {
-              var bump = THREE.ImageUtils.loadTexture("assets/textures/general/" + bump)
-              mat.bumpMap = bump;
-              mat.bumpScale = scale;
-            }
+       //     if (bump&&scale) {
+       //       var bump = THREE.ImageUtils.loadTexture("assets/textures/general/" + bump)
+       //       mat.bumpMap = bump;
+       //       mat.bumpScale = scale;
+       //     }
 
-            var mesh = new THREE.Mesh(geom, mat);
+       //     var mesh = new THREE.Mesh(geom, mat);
 
-            return mesh;
-      }
+       //     return mesh;
+     // }
+      function createMesh(geometry,image,bump, scale) {
+    if(bump)
+        material = mkTextureMaterialBump(image,bump, scale);   
+    else
+        material = mkTextureMaterial(image);
+    geometry.computeVertexNormals();
+    var mesh = new THREE.Mesh(geometry,material);
+    return mesh;    
+}
+
+function mkTextureMaterial(image) {
+
+    var texture = THREE.ImageUtils.loadTexture("assets/textures/general/" + image);
+    var material = new THREE.MeshPhongMaterial({
+    map: texture,
+    })
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+    return material;
+}
+
+function mkTextureMaterialBump(image,bump, scale) {
+
+    var texture = THREE.ImageUtils.loadTexture("assets/textures/general/" + image);
+    var material = new THREE.MeshPhongMaterial({color: 0xffffff, map: texture})
+    var bumpTexture = THREE.ImageUtils.loadTexture("assets/textures/general/"+bump);
+    material.bumpMap = bumpTexture;
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+    bumpTexture.wrapS = bumpTexture.wrapT = THREE.RepeatWrapping;
+    material.bumpScale = scale;
+    return material;
+}
+
+
 
  	function createFloorTextureExt (height, weight, position){
             var planeGeometry = new THREE.PlaneGeometry(weight,height,weight,height,weight,height);
@@ -134,14 +167,29 @@
             var planeGeometry = new THREE.PlaneGeometry(weight,height,weight,height,weight,height);
             var planeMaterial = new THREE.MeshLambertMaterial({ ambient: 0xFFFFff,
             specular: 0xffffff, shininess: 15, shading: THREE.SmoothShading, side: THREE.DoubleSide});
-            var plane = createMesh(planeGeometry, "white-wall.jpg", "white-wall-bump.jpg", 0.09);
-            
+            var plane = createMesh(planeGeometry, "white-wave.jpg", "white-wave-bump.jpg", 0.09);
+            plane.material.map.repeat.set(16,8);
+
             plane.position.set(position[0], position[1], position[2]);
 
             return plane;
 
 
         }
+
+
+ function createRoomWall (height, weight, position){
+            var planeGeometry = new THREE.PlaneGeometry(weight,height,weight,height,weight,height);
+            var planeMaterial = new THREE.MeshLambertMaterial({ ambient: 0xFFFFff,
+            specular: 0xffffff, shininess: 15, shading: THREE.SmoothShading, side: THREE.DoubleSide});
+            var plane = createMesh(planeGeometry, "room-wall.png");
+            
+            plane.position.set(position[0], position[1], position[2]);
+
+            return plane;
+
+
+        }       
 
 function createDoorWall(position){
             var shape = new THREE.Shape();
@@ -179,11 +227,11 @@ function createDoorWall(position){
             wallMesh.rotation.x = Math.PI/2;
             wallMesh.position.set(position[0], position[1], position[2]);
 
-            var wall = createMesh(wallGeometry, "white-grunge.jpg", null, 0.09);
+            var wall = createMesh(wallGeometry, "white-wave.jpg", "white-wave-bump.jpg", 0.09);
 
-            wall.material.map.wrapT = THREE.RepeatWrapping;
-            wall.material.map.wrapS = THREE.RepeatWrapping;  
-            wall.material.map.repeat.set(10,10);
+            //wall.material.map.wrapT = THREE.RepeatWrapping;
+            //wall.material.map.wrapS = THREE.RepeatWrapping;  
+            wall.material.map.repeat.set(.3,.3);
 
             wall.rotation.y = Math.PI/2;
             wall.rotation.x = Math.PI/2;
@@ -217,30 +265,38 @@ function createDoorWall(position){
             shape.lineTo(23.5,25);
             shape.lineTo(37.5,25);
             shape.lineTo(37.5,0);
-            shape.lineTo(47,0);
-            shape.lineTo(47, 30);
+            shape.lineTo(46.5,0);
+            shape.lineTo(46.5, 30);
             shape.lineTo(0,30);
 
             var wallGeometry = new THREE.ExtrudeGeometry(shape,options);
 
 
-            var mat = new THREE.MeshPhongMaterial();
-            var wallMesh = new THREE.Mesh (wallGeometry, mat);
-            wallMesh.rotation.y = Math.PI/2;
-            wallMesh.rotation.x = Math.PI/2;
-            wallMesh.position.set(position[0], position[1], position[2]);
+            
+            var wall = createMesh(wallGeometry, "white-wave.jpg", "white-wave-bump.jpg", 0.09);
+            wall.material.map.repeat.set(.2,.3);
 
-            var wall = createMesh(wallGeometry, "white-grunge.jpg", "white-wall-bump.jpg", 0.09);
-
-            wall.material.map.wrapT = THREE.RepeatWrapping;
-            wall.material.map.wrapS = THREE.RepeatWrapping;  
-            wall.material.map.repeat.set(10,10);
 
             wall.rotation.y = Math.PI/2;
             wall.rotation.x = Math.PI/2;
             wall.position.set(position[0], position[1], position[2]);
 
             return wall;
+        }
+        function createLivingWall (height, weight, position){
+            var planeGeometry = new THREE.PlaneGeometry(weight,height,weight,height,weight,height);
+            var planeMaterial = new THREE.MeshLambertMaterial({ ambient: 0xFFFFff,
+            specular: 0xffffff, shininess: 15, shading: THREE.SmoothShading, side: THREE.DoubleSide});
+            var plane = createMesh(planeGeometry, "white-wave.jpg", "white-wave-bump.jpg", 0.09);
+            plane.material.map.repeat.set(8,8);
+
+
+            
+            plane.position.set(position[0], position[1], position[2]);
+
+            return plane;
+
+
         }
  function createWindow (weight, position){
             var windowGeometry
@@ -249,24 +305,10 @@ function createDoorWall(position){
             finestra.rotation.x = Math.PI/2;
             finestra.rotation.y = -Math.PI/2;
 
-            //finestra.scale.x = weight;
-            //finestra.scale.y = 0.25;
-            //finestra.scale.z = 0.1;
+          
            finestra.position.set(position[0], position[1], position[2]);
 
            return finestra;
            
 }
 
-function createLivingWall (height, weight, position){
-            var planeGeometry = new THREE.PlaneGeometry(weight,height,weight,height,weight,height);
-            var planeMaterial = new THREE.MeshLambertMaterial({ ambient: 0xFFFFff,
-            specular: 0xffffff, shininess: 15, shading: THREE.SmoothShading, side: THREE.DoubleSide});
-            var plane = createMesh(planeGeometry, "white-wall.jpg", "white-wall-bump.jpg", 0.09);
-            
-            plane.position.set(position[0], position[1], position[2]);
-
-            return plane;
-
-
-        }

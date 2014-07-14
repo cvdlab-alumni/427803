@@ -38,7 +38,7 @@ function createSofa(position){
     lamp.position.set(position[0],position[1], position[2]);
     lamp.scale.set(13,13,13);
     lamp.rotation.x = Math.PI/2;
-    var light = createLight(1/13, [position[0],position[1],position[2]+4] );
+    var light = createLightForLamp(1/13, position);
     light.position.y = 1.28;
     light.position.x = .185;
 
@@ -50,28 +50,162 @@ function createSofa(position){
 
   }
 
-  function createLight(diameter){
+  function createWallLamp(position){
+  	var options = THREE.DoubleSide;
+    var lamp = importObjMtl('assets/models/living_lamp/wall-spotlight.obj', 'assets/models/living_lamp/wall-spotlight.mtl', options, null);
+    lamp.position.set(position[0],position[1], position[2]);
+    //lamp.scale.set(13,13,13);
+    //lamp.rotation.x = Math.PI/2;
+    var light = createLightForWallLamp(.37, position);
+    light.position.z = 1.45;
+    light.position.y = -.45;
+
+    lamp.add(light);
+    lamp.rotation.z = Math.PI/2;
+    lamp.rotation.y = Math.PI/2;
+    lamp.scale.set(1.2,1.2,1.2);
+    lamp.rotation.x = Math.PI;
+
+
+    return lamp;
+
+  }
+
+  function createLampadario(position){
+  	var options = THREE.DoubleSide;
+    var lamp = importObjMtl('assets/models/living_lamp/hanging-restaurant-light.obj', 'assets/models/living_lamp/hanging-restaurant-light.mtl', options, null);
+    lamp.position.set(position[0],position[1], position[2]);
+    //lamp.rotation.x = Math.PI/2;
+    var light = createLightForLampadario(.6, position);
+   
+   light.position.y = 0.7;
+   light.rotation.y = Math.PI;
+    lamp.add(light);
+    lamp.rotation.y = Math.PI/2;
+    lamp.scale.set(1.2,1.2,1.2);
+    lamp.rotation.x = Math.PI/2;
+
+
+    return lamp;
+
+  }
+
+
+  function createLightForWallLamp(diameter, position){
+  		  var sphereGeometry = new THREE.SphereGeometry(diameter/2,15,15);
+          var sphereMaterial = new THREE.MeshPhongMaterial({color: 0xFFFF99, shininess: 100, side: THREE.DoubleSide });
+          var bulb = new THREE.Mesh(sphereGeometry, sphereMaterial);
+
+
+          //Point Light
+          var spotLight1= new THREE.PointLight(0xFFFFEB);
+          spotLight1.position = bulb.position;
+          spotLight1.intensity = .8;
+          spotLight1.distance = 60;
+
+         
+          //Point light
+          var pointColor = "#fbfdfc";
+          var pointLight = new THREE.PointLight(pointColor);
+          pointLight.distance = 7.5;
+          pointLight.intensity = .01;
+          pointLight.position = bulb.position;
+
+
+          var sphereGeometryT = new THREE.SphereGeometry(5,15,15);
+          var sphereMaterialT = new THREE.MeshLambertMaterial({color: 0xFFFF00, castShadow: true});
+        
+          bulb.add(spotLight1);
+          bulb.add(pointLight);
+          bulb.position.set(0,0,0);
+
+          return bulb;
+  }
+
+  function createLightForLampadario(diameter, position){
+  		  var sphereGeometry = new THREE.SphereGeometry(diameter/2,15,15);
+          var sphereMaterial = new THREE.MeshPhongMaterial({color: 0xFFFF99, shininess: 10, side: THREE.DoubleSide });
+          var bulb = new THREE.Mesh(sphereGeometry, sphereMaterial);
+
+
+          //Point Light
+          var spotLight1= new THREE.PointLight(0xFFFFEB);
+          spotLight1.position = bulb.position;
+          spotLight1.intensity = .9;
+          spotLight1.distance = 60;
+
+          var spotLightHelper = new THREE.PointLightHelper( spotLight1, 2 );
+          scene.add(spotLightHelper );
+
+         
+          //Point light
+          var pointColor = "#fbfdfc";
+          var pointLight = new THREE.PointLight(pointColor);
+          pointLight.distance = 7.5;
+          pointLight.intensity = 1;
+          pointLight.position = bulb.position;
+
+
+          var sphereGeometryT = new THREE.SphereGeometry(5,15,15);
+          var sphereMaterialT = new THREE.MeshLambertMaterial({color: 0xFFFF00, castShadow: true});
+        
+          bulb.add(spotLight1);
+          bulb.add(pointLight);
+          bulb.position.set(0,0,0);
+
+          return bulb;
+  }
+
+  function createLightForLamp(diameter, position){
           var sphereGeometry = new THREE.SphereGeometry(diameter/2,15,15);
           var sphereMaterial = new THREE.MeshPhongMaterial({color: 0xFFFF99, shininess: 10, opacity: 0.9, transparent: true, side: THREE.BackSide });
           var bulb = new THREE.Mesh(sphereGeometry, sphereMaterial);
 
 
-          //Spot light
-          var spotLight = new THREE.PointLight( 0xfbfdfc ,1);
-          spotLight.position = bulb.position;
-          spotLight.castShadow = true;
-          spotLight.shadow;
+          //Spot light DOWN
+          var spotLight = new THREE.SpotLight( 0xFFFFC7 ,1);
+          spotLight.position.set(0,0,0);
           spotLight.intensity = .5;
+          var target = new THREE.Object3D();
+          target.position.set(position[0]-2,0, position[2]-5);
+          target.visible = false;
 
-          spotLight.shadowCameraNear = 1;
-          spotLight.shadowCameraFar = 1000;
+          spotLight.target = target;
+          spotLight.angle = Math.PI/5;
+          spotLight.rotation.x = Math.PI/2;
+
+          var lightDiffuse = new THREE.PointLight (0xFFFFC7);
+          lightDiffuse.distance = 30;
+          lightDiffuse.intensity = .6;
+          lightDiffuse.position.set(0,0,0);
+
+          //Spot light UP
+          var spotLightU = new THREE.SpotLight( 0xFFFFC7 ,1);
+          spotLightU.position.set(0,0,0);
+          spotLightU.intensity = .5;
+          var targetU = new THREE.Object3D();
+          targetU.position.set(position[0]-2,30, position[2]-5);
+          targetU.visible = false;
+
+          spotLightU.target = targetU;
+          spotLightU.angle = Math.PI/5;
+          spotLightU.rotation.x = -Math.PI/2;
+
+
+
+          var sphereSize3 = 2;
+          var spotLightHelper = new THREE.SpotLightHelper( spotLight, sphereSize3 );
+          scene.add(spotLightHelper );
+          var spotLightHelperU = new THREE.SpotLightHelper( spotLightU, sphereSize3 );
+          scene.add(spotLightHelperU );
+         
 
 
           //Point light
           var pointColor = "#fbfdfc";
           var pointLight = new THREE.PointLight(pointColor);
           pointLight.distance = 7.5;
-          pointLight.intensity = 1;
+          pointLight.intensity = .5;
           pointLight.position = bulb.position;
 
 
@@ -85,7 +219,10 @@ function createSofa(position){
           //target.position.z = 4;
           //spotLight.add(target);
           //target.visible = false;
+
+          bulb.add(spotLightU);
           bulb.add(spotLight);
+          bulb.add(lightDiffuse);
           bulb.add(pointLight);
           bulb.position.set(0,0,0);
 

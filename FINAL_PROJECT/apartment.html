@@ -80,7 +80,7 @@
 
 
 
-<!-- Code to display an information button and box when clicked. -->
+<!-- Code to display an information button and box when clicked.
 <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
 <link rel=stylesheet href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
@@ -90,7 +90,7 @@
 <div id="infoBox" title="Demo Information">
 This is the FINAL PROJECT of Cristoforo Parrotta/</a>
 </div>
-<div id="blocker">
+<! <div id="blocker">
 
       <div id="instructions">
         <span style="font-size:40px">Click to play</span>
@@ -98,11 +98,11 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
         (W, A, S, D = Move, SPACE = Jump, MOUSE = Look around)
       </div>
 
-    </div>
+    </div> -->
 
     <script>
 
-        var camera, scene, renderer,apt;
+        var camera, scene, renderer,apt, trackballControls;
         var projector, mouse = { x: 0, y: 0 };
 
         var controls;
@@ -111,71 +111,71 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
 
         var ray;
 
-        var blocker = document.getElementById( 'blocker' );
-        var instructions = document.getElementById( 'instructions' );
+        //var blocker = document.getElementById( 'blocker' );
+        //var instructions = document.getElementById( 'instructions' );
 
       // http://www.html5rocks.com/en/tutorials/pointerlock/intro/
 
-        var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
+        //var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
 
-        if ( havePointerLock ) {
-        var element = document.body;
-        var pointerlockchange = function ( event ) {
+        //if ( havePointerLock ) {
+        //var element = document.body;
+        //var pointerlockchange = function ( event ) {
 
-          if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element ) {
-            controls.enabled = true;
-            blocker.style.display = 'none';
-          } else {
-            controls.enabled = false;
-            blocker.style.display = '-webkit-box';
-            blocker.style.display = '-moz-box';
-            blocker.style.display = 'box';
-            instructions.style.display = '';
-          }
-        }
+        //if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element ) {
+        //    controls.enabled = true;
+        //    blocker.style.display = 'none';
+        //  } else {
+        //    controls.enabled = false;
+        //    blocker.style.display = '-webkit-box';
+        //    blocker.style.display = '-moz-box';
+        //    blocker.style.display = 'box';
+        //    instructions.style.display = '';
+        //  }
+        //}
 
-        var pointerlockerror = function ( event ) {
-          instructions.style.display = '';
-        }
+       // var pointerlockerror = function ( event ) {
+       //   instructions.style.display = '';
+       // }
 
         // Hook pointer lock state change events
-        document.addEventListener( 'pointerlockchange', pointerlockchange, false );
-        document.addEventListener( 'mozpointerlockchange', pointerlockchange, false );
-        document.addEventListener( 'webkitpointerlockchange', pointerlockchange, false );
+       // document.addEventListener( 'pointerlockchange', pointerlockchange, false );
+       // document.addEventListener( 'mozpointerlockchange', pointerlockchange, false );
+       // document.addEventListener( 'webkitpointerlockchange', pointerlockchange, false );
 
-        document.addEventListener( 'pointerlockerror', pointerlockerror, false );
-        document.addEventListener( 'mozpointerlockerror', pointerlockerror, false );
-        document.addEventListener( 'webkitpointerlockerror', pointerlockerror, false );
+       // document.addEventListener( 'pointerlockerror', pointerlockerror, false );
+       // document.addEventListener( 'mozpointerlockerror', pointerlockerror, false );
+       // document.addEventListener( 'webkitpointerlockerror', pointerlockerror, false );
 
-        instructions.addEventListener( 'click', function ( event ) {
-          instructions.style.display = 'none';
+       // instructions.addEventListener( 'click', function ( event ) {
+       //   instructions.style.display = 'none';
 
           // Ask the browser to lock the pointer
-          element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
+       //   element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
 
-          if ( /Firefox/i.test( navigator.userAgent ) ) {
-            var fullscreenchange = function ( event ) {
+        //  if ( /Firefox/i.test( navigator.userAgent ) ) {
+        //    var fullscreenchange = function ( event ) {
 
-              if ( document.fullscreenElement === element || document.mozFullscreenElement === element || document.mozFullScreenElement === element ) {
-                document.removeEventListener( 'fullscreenchange', fullscreenchange );
-                document.removeEventListener( 'mozfullscreenchange', fullscreenchange );
-                element.requestPointerLock();
-              }
-            }
+         //     if ( document.fullscreenElement === element || document.mozFullscreenElement === element || document.mozFullScreenElement === element ) {
+         //       document.removeEventListener( 'fullscreenchange', fullscreenchange );
+         //       document.removeEventListener( 'mozfullscreenchange', fullscreenchange );
+         //       element.requestPointerLock();
+         //     }
+         //   }
 
-            document.addEventListener( 'fullscreenchange', fullscreenchange, false );
-            document.addEventListener( 'mozfullscreenchange', fullscreenchange, false );
+         //   document.addEventListener( 'fullscreenchange', fullscreenchange, false );
+         //   document.addEventListener( 'mozfullscreenchange', fullscreenchange, false );
 
-            element.requestFullscreen = element.requestFullscreen || element.mozRequestFullscreen || element.mozRequestFullScreen || element.webkitRequestFullscreen;
-            element.requestFullscreen();
+         //   element.requestFullscreen = element.requestFullscreen || element.mozRequestFullscreen || element.mozRequestFullScreen || element.webkitRequestFullscreen;
+         //   element.requestFullscreen();
 
-          } else {
-            element.requestPointerLock();
-          }
-        }, false );
-      } else {
-        instructions.innerHTML = 'Your browser doesn\'t seem to support Pointer Lock API';
-      }
+         // } else {
+         //   element.requestPointerLock();
+         // }
+        //}, false );
+      //} else {
+       // instructions.innerHTML = 'Your browser doesn\'t seem to support Pointer Lock API';
+     // }
 
         init();
         animate();
@@ -287,7 +287,7 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
         //camera.up = new THREE.Vector3(1,0,0);
         //camera.down = new THREE.Vector3(-1,0,0);
         //camera.lookAt(new THREE.Vector3(3,0,2.95));
-        controls = new THREE.PointerLockControls( camera );
+        //controls = new THREE.PointerLockControls( camera );
 
 
         //var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
@@ -301,7 +301,7 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
         //----------------------------------------------------------------------------------------------
         // FP CONTROL
         //----------------------------------------------------------------------------------------------
-        scene.add( controls.getObject() );
+        //scene.add( controls.getObject() );
 
         ray = new THREE.Raycaster();
         ray.ray.direction.set( 0, -1, 0 );
@@ -316,7 +316,7 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
         //----------------------------------------------------------------------------------------------
         // TRACKBALL SET UP
         //----------------------------------------------------------------------------------------------        
-        var trackballControls = new THREE.TrackballControls(camera);
+         trackballControls = new THREE.TrackballControls(camera);
 
 
         //----------------------------------------------------------------------------------------------
@@ -341,7 +341,7 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
         entranceFloor.material.map.repeat.set(3,5.4);
         entranceFloorLiving.material.map.repeat.set(1.8,.6);
         apartment.add(entranceFloor);
-       apartment.add(entranceFloorLiving);
+        apartment.add(entranceFloorLiving);
 
         //scene.add(entranceFloor);
         //scene.add(entranceFloorLiving);
@@ -351,17 +351,6 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
         var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x9999ff, side: THREE.BackSide } );
         var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
         scene.add(skyBox);
-
-        
-
-
-        //Picture
-        var vivaLaVida = createPicture(30,25,[3.02,80,20]);
-        vivaLaVida.rotation.z = Math.PI/2;
-        vivaLaVida.rotation.y = Math.PI/2;
-        vivaLaVida.scale.set(0.6,.6,1.1);
-        apartment.add(vivaLaVida);
-        //scene.add(vivaLaVida);
 
 
         //////////
@@ -385,7 +374,7 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
         bathWallR.rotation.x = Math.PI*(3/2);
 
         //Bath Wall WINDOW
-        var bathWallW = createBathFloor (9.5, 30, [47.99,69.6,15]);
+        var bathWallW = createBathFloor (8.9, 30, [47.99,70.1,15]);
         bathWallW.material.map.wrapT = THREE.RepeatWrapping;
         bathWallW.material.map.wrapS = THREE.RepeatWrapping;
         bathWallW.material.map.repeat.set(.5,.5);
@@ -405,8 +394,7 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
         bathWallW3Bottom.rotation.y = Math.PI*(3/2);
 
         var bathWallW3Up = createBathFloor (5, 5, [60.49,79,27.5]);
-        //bathWallW.material.map.wrapT = THREE.RepeatWrapping;
-        //bathWallW.material.map.wrapS = THREE.RepeatWrapping;
+       
         bathWallW3Up.material.map.repeat.set(.25,.25);
 
         bathWallW3Up.rotation.y = Math.PI*(3/2);
@@ -416,24 +404,16 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
         var entranceWall = createGeneralWall(27,107, [3.01,67,16.5]);
         entranceWall.rotation.z = Math.PI/2;
         entranceWall.rotation.y = Math.PI/2;
-        entranceWall.material.map.wrapT = THREE.RepeatWrapping;
-        entranceWall.material.map.wrapS = THREE.RepeatWrapping; 
-        entranceWall.material.map.repeat.set(1,1);
+        
 
         apartment.add(entranceWall);
         //scene.add(entranceWall);
 
         //Door Wall
         var doorWall = createDoorWall([22.99,49,3]);
-        //doorWall.material.map.wrapT = THREE.RepeatWrapping;
-        //doorWall.material.map.wrapS = THREE.RepeatWrapping; 
-        //doorWall.material.map.repeat.set(1,1);
-        //doorWall.rotation.z = Math.PI/2;
-        //doorWall.rotation.y = -Math.PI/2;
+      
 
         apartment.add(doorWall);
-
-        //scene.add(doorWall);
 
         //Kitchen Wall
         var kitchenWall = createKitchenWall(43.5,28,[44.7,48.48,16]);
@@ -445,8 +425,6 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
         
         apartment.add(kitchenWall);
 
-        //scene.add(kitchenWall);
-
         //Big WIndow Wall
         var bigWindowWall = createWindowsWall([65.99,3,0]);
         
@@ -456,19 +434,42 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
 
         //Living Wall
         var livingWall = createLivingWall (30, 44, [45,3.01,15]);
-        livingWall.material.map.wrapT = THREE.RepeatWrapping;
-        livingWall.material.map.wrapS = THREE.RepeatWrapping;
-        livingWall.material.map.repeat.set(1,1);
+        
         
         livingWall.rotation.x = Math.PI*(3/2);
-        var livingDown = createLivingWall (30, 13, [26.01,9.3,15]);
+        var livingDown = createLivingWall (30, 13, [26.01,9.5,15]);
         livingDown.rotation.z = Math.PI/2;
         livingDown.rotation.y = Math.PI/2;
+        livingDown.material.map.repeat.set(2,8);
 
         apartment.add(livingWall);
         apartment.add(livingDown);
         //scene.add(livingWall);
         //scene.add(livingDown);
+
+        //Room Wall
+        //DX
+        var roomDxWall = createRoomWall(30, 44, [45,49.51,15]);
+        roomDxWall.rotation.x = Math.PI*(3/2);
+        roomDxWall.rotation.z = Math.PI;
+       
+        roomDxWall.material.map.wrapT = THREE.RepeatWrapping;
+        roomDxWall.material.map.wrapS = THREE.RepeatWrapping; 
+        roomDxWall.material.map.repeat.set(6,3);
+
+        apartment.add(roomDxWall);
+
+        //SX
+        var roomSxWall = createRoomWall(30, 44, [45,69.49,15]);
+        roomSxWall.rotation.x = Math.PI/2;
+        //roomSxWall.rotation.z = Math.PI;
+       
+        roomSxWall.material.map.wrapT = THREE.RepeatWrapping;
+        roomSxWall.material.map.wrapS = THREE.RepeatWrapping; 
+        roomSxWall.material.map.repeat.set(6,3);
+
+        apartment.add(roomSxWall);
+
 
         ///////////
         // DOORS //
@@ -529,21 +530,7 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
         apartment.add(roomWindow);
         apartment.add(bathWindow);
         apartment.add(bedWindow);
-        //scene.add(bathFloor);
-        //scene.add(bathWall);
-        //scene.add(bathWallR);
-        //scene.add(bathWallW);
-        //scene.add(bathWallW2);
-        //scene.add(bathWallW3Bottom);
-        //scene.add(bathWallW3Up);
-        //scene.add(door);
-        //scene.add(roomDoor);
-        //scene.add(bathDoor);
-        //scene.add(bedDoor);
-        //scene.add(livingWindow);
-        //scene.add(roomWindow);
-        //scene.add(bathWindow)
-        //scene.add(bedWindow);
+    
 
 
 
@@ -551,41 +538,42 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
         // LIVING //
         /////////////
 
+        //Picture
+        var vivaLaVida = createPicture(30,25,[3.02,68,18]);
+        vivaLaVida.rotation.z = Math.PI/2;
+        vivaLaVida.rotation.y = Math.PI/2;
+        vivaLaVida.scale.set(0.6,.6,1.1);
+        apartment.add(vivaLaVida);
+        //scene.add(vivaLaVida);
+
         //TV
         var tv = createTV([30, 10, 14]);
         tv.rotation.y = -Math.PI/3+Math.PI;
         apartment.add(tv);
-        //scene.add(tv);
 
         //LAMP
         var lamp = createLamp([63, 6, 3]);
         lamp.rotation.y = -Math.PI;
         apartment.add(lamp);
-        //scene.add(lamp);
 
         //SOFA
         var sofa = createSofa([47, 9, 8]);
         apartment.add(sofa);
-        //scene.add(sofa);
 
         //TV STAND
         var tvStand = createTvStand([31.4, 10, 3]);
         apartment.add(tvStand);
-        //scene.add(tvStand);
 
         //TABLE 
         var table = createTable([46, 27, 3]);
         apartment.add(table);
 
-        //scene.add(table);
         var chairT = createChair ([43, 28, 2.9]);
         apartment.add(chairT);
 
-        //scene.add(chairT);
         var chairT1 = createChair ([51, 30, 2.9]);
         chairT1.rotation.y = -Math.PI/2;
         apartment.add(chairT1);
-        //scene.add(chairT1);
 
 
         //KITCHEN
@@ -593,14 +581,12 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
         
         apartment.add(kitchen);
 
-        //scene.add(kitchen);
 
         //Fridge
         var fridge = createFridge([35.8, 48.5, 3]);
         
         apartment.add(fridge);
 
-        //scene.add(fridge);
 
        
         /////////////
@@ -609,16 +595,13 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
         var bed = createSingleBed([0, 30, 3]);
         bed.rotation.y = Math.PI/2;
         apartment.add(bed);
-        //scene.add(bed);
 
         var mobile = createArmadio([76, 55, 3]);
         mobile.rotation.y = Math.PI;
         apartment.add(mobile);
-        //scene.add(mobile);
 
         var desk = createDesk([0, 0, 0]);
         apartment.add(desk);
-        //scene.add(desk);
 
         /////////////
         // BATH   //
@@ -626,17 +609,14 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
         var wc = createWc([60, 75, 3]);
         wc.rotation.y = -Math.PI/2;
          apartment.add(wc);
-        //scene.add(wc);
 
         var lavabo = createLavabo([50, 73, 3]);
         lavabo.rotation.y = Math.PI;
         apartment.add(lavabo);
-        //scene.add(lavabo);
 
         var shower = createShower([26,106.5,3]);
         shower.rotation.y = Math.PI*(3/2);
         apartment.add(shower);
-        //scene.add(shower);
 
 
         /////////////
@@ -645,22 +625,51 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
         var dbed = createDoubleBed([47,120,3]);
         dbed.rotation.y = Math.PI*2;
         apartment.add(dbed);
-        //scene.add(dbed);
 
         var samsung = createSamsung([60, 66, 2.9]);
         samsung.rotation.y = -Math.PI/2;
         apartment.add(samsung);
-        //scene.add(samsung);
 
 
         var pc = createMac([60, 64, 11]);
         apartment.add(pc);
-        //scene.add(pc);
 
         var chair = createChair ([60, 64, 2.9]);
         chair.rotation.y = Math.PI;
         apartment.add(chair);
-        //scene.add(chair);
+
+        var lamp1 = createWallLamp ([4,30, 25]);
+        apartment.add(lamp1);
+
+        var lamp2 = createWallLamp ([4, 55,25]);
+        apartment.add(lamp2);
+
+        var lamp3 = createWallLamp ([4, 80, 25]);
+        apartment.add(lamp3);
+        
+        var lamp4 = createWallLamp ([4,105, 25]);
+        apartment.add(lamp4);
+
+        var lampadarioL = createLampadario([45,30,26]);
+                lampadarioL.scale.set(1,.7,1);
+
+        apartment.add(lampadarioL);
+
+        var lampadarioR = createLampadario([45,60,26]);
+                        lampadarioR.scale.set(1,.7,1);
+
+        apartment.add(lampadarioR);
+
+        var lampadarioB = createLampadario([45,80,26]);
+                        lampadarioB.scale.set(1,.7,1);
+
+        apartment.add(lampadarioB);
+
+        var lampadarioBed = createLampadario([45,110,26]);
+                        lampadarioBed.scale.set(1,.7,1);
+
+        apartment.add(lampadarioBed);
+
         apartment.rotation.x = -Math.PI/2;
 
 
@@ -686,24 +695,6 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
         //----------------------------------------------------------------------------------------------
         // LIGHTS SET UP 
         //---------------------------------------------------------------------------------------------- 
-        //POINT LIGHT
-          var pointColor = "#FFFFFF";
-          var directionalLight = new THREE.DirectionalLight(pointColor);
-          directionalLight.position.set(0, 0, 200);
-          directionalLight.shadowCameraNear = 2;
-          directionalLight.shadowCameraFar = 200;
-          directionalLight.shadowCameraLeft = -50;
-          directionalLight.shadowCameraRight = 50;
-          directionalLight.shadowCameraTop = 50;
-          directionalLight.shadowCameraBottom = -50;
-
-          //directionalLight.distance = 0;
-          directionalLight.intensity = 1;
-          directionalLight.shadowMapHeight = 1024;
-          directionalLight.shadowMapWidth = 1024;
-
-
-         // scene.add(directionalLight);
 
 
 
@@ -711,32 +702,16 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
         spotLight1.position.set(-30, 200, -100);
         spotLight1.intensity = .5;
         //spotLight1.rotation.x = -Math.PI/2;
-        scene.add(spotLight1);
+        //scene.add(spotLight1);
 
         var spotLight2 = new THREE.SpotLight(0xffffff);
         spotLight2.position.set(30, 200, 100);
         spotLight2.intensity = 1;
         //spotLight2.rotation.x = -Math.PI/2;
 
-        scene.add(spotLight2);
 
-        var spotLightLiving = new THREE.PointLight(0xfbfdfc);
-        spotLightLiving.position.set(65, 27, -37);
-        var targText = new THREE.Object3D;
-        targText.position.set(35, 0, -27);
-        spotLightLiving.target = targText;
-        spotLightLiving.intensity = .2;
-        //spotLightLiving.rotation.x = -Math.PI/2;
-
-        scene.add(spotLightLiving);
-
-        var spotLightBath = new THREE.PointLight(0xfbfdfc);
-        spotLightBath.position.set(50, 30, -80);
-        var targText = new THREE.Object3D;
-        //targText.position.set(35, 0, -27);
-        spotLightBath.intensity = .2;
-
-        scene.add(spotLightBath);
+       
+        
 
 
         //----------------------------------------------------------------------------------------------
@@ -746,24 +721,13 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
         scene.add(inspectedCamera);
         scene.add(cameraHelper);
 
-        //Ambient Light HELPER
-        var sphereSize = 1;
-        var directionalLightHelper = new THREE.DirectionalLightHelper( directionalLight, sphereSize );
-        //scene.add( directionalLightHelper );
-
         //SpotLight HELPER
-        var sphereSize2 = 2;
-        var spotLightHelper = new THREE.SpotLightHelper( spotLight1, sphereSize2 );
-        scene.add(spotLightHelper );
+        //var sphereSize3 = 2;
+        //var spotLightHelperL = new THREE.PointLightHelper( spotLightLiving, sphereSize3 );
+        //scene.add(spotLightHelperL );
 
-        //SpotLight HELPER
-        var sphereSize3 = 2;
-        var spotLightHelper2 = new THREE.SpotLightHelper( spotLight2, sphereSize3 );
-        scene.add(spotLightHelper2 );
+        
 
-        var sphereSize4 = 2;
-        var spotLightHelper3 = new THREE.PointLightHelper( spotLightBath, sphereSize3 );
-        scene.add(spotLightHelper3 );
         //----------------------------------------------------------------------------------------------
         // APPEND THE RENDERER TO THE PAGE BODY
         //---------------------------------------------------------------------------------------------- 
@@ -783,7 +747,7 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
 
           this.showCanvas = function () {
             if (controlsSet.showVideo) {
-              $video.show().play();
+              $video.show();
             } else {
               $video.hide();
             }
@@ -842,7 +806,7 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
         //---------------------------------------------------------------------------------------------- 
         function animate() {
           //stats.update();
-          //trackballControls.update();
+          trackballControls.update();
 
           if (video.readyState === video.HAVE_ENOUGH_DATA) {
               if (texture) texture.needsUpdate = true;
@@ -854,11 +818,10 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
           //if ( intersections.length > 0 ) {
           //var distance = intersections[ 0 ].distance;
           
-        controls.update();
+        //controls.update();
         renderer.render( scene, camera );
         }
 
-        //controls.update();
       
 
 
