@@ -77,7 +77,7 @@ function createSofa(position){
     		isOn = false;
     	} else{
     		new TWEEN.Tween(light.children[0])
-                               .to({intensity: 0.8},2500)
+                               .to({intensity: 0.6},2500)
                                .start();
     		//light.children[0].visible = true;
     		//lamp.children[0].children[1].visible = true;

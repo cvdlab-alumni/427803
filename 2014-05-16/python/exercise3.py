@@ -1,5 +1,8 @@
 from pyplasm import *
+import os,sys
+sys.path.insert(0, '/Users/toucherjay/Desktop/lar-cc/lib/py')
 from larcc import *
+from sysml import *
 DRAW = COMP([VIEW,STRUCT,MKPOLS])
 
 
