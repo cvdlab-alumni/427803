@@ -16,7 +16,7 @@ function createPicture (w,h, position){
   var texture;
 var $video = $('#video');
 var video = $video[0];
-video.pause();
+video.play();
 texture = new THREE.Texture(video);
 texture.minFilter = THREE.LinearFilter;
 texture.magFilter = THREE.LinearFilter;
