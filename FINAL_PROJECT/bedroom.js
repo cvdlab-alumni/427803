@@ -1,7 +1,8 @@
 function createSingleBed(position){
     var options = THREE.DoubleSide;
-      var bed = importObjMtl('assets/models/lettoAzzurro/lettoAzzurro.obj', 'assets/models/lettoAzzurro/lettoAzzurro.mtl', options, null);
-      bed.scale.set(.1,.1,.1);
+      var bed = importObjMtl('assets/models/bed/room-bed.obj', 'assets/models/bed/room-bed.mtl', options, null);
+      bed.scale.set(.22,.25,.27);
+      //bed.scale.set(.1,.1,.1);
       bed.rotation.x = Math.PI/2;
       bed.position.set(position[0],position[1], position[2]);
       return bed;

@@ -24,36 +24,36 @@ texture.format = THREE.RGBFormat;
 texture.generateMipmaps = false;
 
 var video_material = new THREE.MeshBasicMaterial({
-	map: texture,
-	shininess: 100
+  map: texture,
+  shininess: 100
 });
 
 function createTvScreen () {
-	var tvScreenGeometry = new THREE.PlaneGeometry(13, 8);
-	var tvScreen = new THREE.Mesh(tvScreenGeometry, video_material);
-	tvScreen.position.set(0, 3, 3);
-	tvScreen.rotation.x =Math.PI / 2;
-	tvScreen.visible = true;
-	tvScreen.isOn = true;
-	tvScreen.interact = function() {
-		if (this.isOn) {
-			video.pause();
-			tvScreen.visible = false;
-			//tvScreen.children[0].intensity = 0;
-			this.isOn = false;
-		} else {
-			tvScreen.visible = true;
-			video.play();
-			//tvScreen.children[0].intensity = 4;
-			this.isOn = true;
-		}
-	}
-	//toIntersect.push(tvScreen);
-	return tvScreen;
+  var tvScreenGeometry = new THREE.PlaneGeometry(13, 8);
+  var tvScreen = new THREE.Mesh(tvScreenGeometry, video_material);
+  tvScreen.position.set(0, 3, 3);
+  tvScreen.rotation.x =Math.PI / 2;
+  tvScreen.visible = true;
+  tvScreen.isOn = true;
+  tvScreen.interact = function() {
+    if (this.isOn) {
+      video.pause();
+      tvScreen.visible = false;
+      //tvScreen.children[0].intensity = 0;
+      this.isOn = false;
+    } else {
+      tvScreen.visible = true;
+      video.play();
+      //tvScreen.children[0].intensity = 4;
+      this.isOn = true;
+    }
+  }
+  //toIntersect.push(tvScreen);
+  return tvScreen;
 }
 
 function createTV(position){
-	 var options = THREE.DoubleSide;
+   var options = THREE.DoubleSide;
 
       var tv = importObjMtl('assets/models/tv.obj', 'assets/models/tv.mtl', options, null);
       //tv.rotation.x =Math.PI / 2;
@@ -69,7 +69,7 @@ function createTV(position){
 }
 
 function createMac(position){
-	var options = THREE.DoubleSide;
+  var options = THREE.DoubleSide;
       var mac = importObjMtl('assets/models/apple_pc/apple_pc.obj', 'assets/models/apple_pc/apple_pc.mtl', options, null);
       mac.scale.set(1.5,1.5,1.5);
       mac.rotation.x = Math.PI/2;
@@ -80,7 +80,7 @@ function createMac(position){
 }
 
 function createChair(position){
-	var options = THREE.DoubleSide;
+  var options = THREE.DoubleSide;
       var chair = importObjMtl('assets/models/chair.obj', 'assets/models/chair.mtl', options, null);
       chair.scale.set(12,12,12);
       chair.rotation.x = Math.PI/2;

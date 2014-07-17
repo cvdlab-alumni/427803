@@ -51,20 +51,40 @@ function createSofa(position){
   }
 
   function createWallLamp(position){
+  	var isOn = false;
   	var options = THREE.DoubleSide;
     var lamp = importObjMtl('assets/models/living_lamp/wall-spotlight.obj', 'assets/models/living_lamp/wall-spotlight.mtl', options, null);
     lamp.position.set(position[0],position[1], position[2]);
     //lamp.scale.set(13,13,13);
     //lamp.rotation.x = Math.PI/2;
-    var light = createLightForWallLamp(.37, position);
+    var light = createLightForWallLamp(.45, position);
     light.position.z = 1.45;
     light.position.y = -.45;
+    light.children[0].intensity = 0;
 
     lamp.add(light);
     lamp.rotation.z = Math.PI/2;
     lamp.rotation.y = Math.PI/2;
     lamp.scale.set(1.2,1.2,1.2);
     lamp.rotation.x = Math.PI;
+
+    light.interact = function() {
+    	if (isOn){new TWEEN.Tween(light.children[0])
+                               .to({intensity: 0},2500)
+                               .start();
+    		//light.children[0].visible = false;
+    		//light.children[1].visible = false;
+    		isOn = false;
+    	} else{
+    		new TWEEN.Tween(light.children[0])
+                               .to({intensity: 0.8},2500)
+                               .start();
+    		//light.children[0].visible = true;
+    		//lamp.children[0].children[1].visible = true;
+    		isOn = true;
+    	}
+    }
+
 
 
     return lamp;
@@ -73,10 +93,11 @@ function createSofa(position){
 
   function createLampadario(position){
   	var options = THREE.DoubleSide;
+  	var isOn = true;
     var lamp = importObjMtl('assets/models/living_lamp/hanging-restaurant-light.obj', 'assets/models/living_lamp/hanging-restaurant-light.mtl', options, null);
     lamp.position.set(position[0],position[1], position[2]);
     //lamp.rotation.x = Math.PI/2;
-    var light = createLightForLampadario(.6, position);
+    var light = createLightForLampadario(.8, position);
    
    light.position.y = 0.7;
    light.rotation.y = Math.PI;
@@ -84,6 +105,15 @@ function createSofa(position){
     lamp.rotation.y = Math.PI/2;
     lamp.scale.set(1.2,1.2,1.2);
     lamp.rotation.x = Math.PI/2;
+    light.interact = function() {
+    	if (isOn){
+    		light.children[0].visible = false;
+    		isOn = false;
+    	} else{
+    		light.children[0].visible = true;
+    		isOn = true;
+    	}
+    }
 
 
     return lamp;
@@ -93,7 +123,7 @@ function createSofa(position){
 
   function createLightForWallLamp(diameter, position){
   		  var sphereGeometry = new THREE.SphereGeometry(diameter/2,15,15);
-          var sphereMaterial = new THREE.MeshPhongMaterial({color: 0xFFFF99, shininess: 100, side: THREE.DoubleSide });
+          var sphereMaterial = new THREE.MeshPhongMaterial({color: 0xFFFFFF, shininess: 10, side: THREE.DoubleSide });
           var bulb = new THREE.Mesh(sphereGeometry, sphereMaterial);
 
 
@@ -126,6 +156,7 @@ function createSofa(position){
   		  var sphereGeometry = new THREE.SphereGeometry(diameter/2,15,15);
           var sphereMaterial = new THREE.MeshPhongMaterial({color: 0xFFFF99, shininess: 10, side: THREE.DoubleSide });
           var bulb = new THREE.Mesh(sphereGeometry, sphereMaterial);
+          bulb.position.set(0,0,0);
 
 
           //Point Light
@@ -135,7 +166,7 @@ function createSofa(position){
           spotLight1.distance = 60;
 
           var spotLightHelper = new THREE.PointLightHelper( spotLight1, 2 );
-          scene.add(spotLightHelper );
+          //scene.add(spotLightHelper );
 
          
           //Point light
@@ -151,7 +182,6 @@ function createSofa(position){
         
           bulb.add(spotLight1);
           bulb.add(pointLight);
-          bulb.position.set(0,0,0);
 
           return bulb;
   }
@@ -175,8 +205,8 @@ function createSofa(position){
           spotLight.rotation.x = Math.PI/2;
 
           var lightDiffuse = new THREE.PointLight (0xFFFFC7);
-          lightDiffuse.distance = 30;
-          lightDiffuse.intensity = .6;
+          lightDiffuse.distance = 40;
+          lightDiffuse.intensity = .8;
           lightDiffuse.position.set(0,0,0);
 
           //Spot light UP
@@ -195,9 +225,9 @@ function createSofa(position){
 
           var sphereSize3 = 2;
           var spotLightHelper = new THREE.SpotLightHelper( spotLight, sphereSize3 );
-          scene.add(spotLightHelper );
+          //scene.add(spotLightHelper );
           var spotLightHelperU = new THREE.SpotLightHelper( spotLightU, sphereSize3 );
-          scene.add(spotLightHelperU );
+          //scene.add(spotLightHelperU );
          
 
 

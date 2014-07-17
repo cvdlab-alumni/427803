@@ -17,7 +17,20 @@
       position: absolute; 
       left 10px: 15px; 
       bottom: 10px;
-    }
+    }#pointer {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        margin-top: -20px;
+        margin-left: -20px;
+        width: 40px;
+        height: 40px;
+        display: none;
+        background-image: url("assets/textures/cursor.png");
+        background-repeat: no-repeat;
+        background-size: contain;
+      }
+      
     #blocker {
         position: absolute;
         width: 100%;
@@ -73,24 +86,28 @@
   <script src="bath.js"></script>
   <script src="assets/libs/FirstPersonControls.js"></script>
   <script src="assets/libs/PointerLockControls.js"></script>
-
-
-
-
-
-
-
-<!-- Code to display an information button and box when clicked.
-<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
-<link rel=stylesheet href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
+    <script src="assets/libs/tween.min.js"></script>
+    <script src="assets/libs/keyframe.js"></script>
+    <script src="assets/libs/jquery-ui.js"></script>
+<link rel=stylesheet href="assets/libs/jquery-ui.css" />
 <link rel=stylesheet href="css/info.css"/>
 <script src="js/info.js"></script>
+<div id="pointer"></div>
+
 <div id="infoButton"></div>
 <div id="infoBox" title="Demo Information">
-This is the FINAL PROJECT of Cristoforo Parrotta/</a>
+This is the FINAL PROJECT of Cristoforo Parrotta. You are welcome in my apartment</a>
 </div>
-<! <div id="blocker">
+
+
+
+
+
+
+
+
+
+ <div id="blocker">
 
       <div id="instructions">
         <span style="font-size:40px">Click to play</span>
@@ -98,84 +115,95 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
         (W, A, S, D = Move, SPACE = Jump, MOUSE = Look around)
       </div>
 
-    </div> -->
+    </div> 
 
     <script>
 
-        var camera, scene, renderer,apt, trackballControls;
+        var camera, scene, renderer,apt, trackballControls, lamp1, lamp2, lamp3, lamp4;
+        var i = true;
         var projector, mouse = { x: 0, y: 0 };
 
         var controls;
 
-        var objects;
+        var objects = [];
 
-        var ray;
+        var ray,  rayPointer ;
+        var gui = new dat.GUI();
 
-        //var blocker = document.getElementById( 'blocker' );
-        //var instructions = document.getElementById( 'instructions' );
+
+      var blocker = document.getElementById( 'blocker' );
+      var instructions = document.getElementById( 'instructions' );
 
       // http://www.html5rocks.com/en/tutorials/pointerlock/intro/
 
-        //var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
+      var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
 
-        //if ( havePointerLock ) {
-        //var element = document.body;
-        //var pointerlockchange = function ( event ) {
+      if ( havePointerLock ) {
+        var element = document.body;
+        var pointerlockchange = function ( event ) {
 
-        //if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element ) {
-        //    controls.enabled = true;
-        //    blocker.style.display = 'none';
-        //  } else {
-        //    controls.enabled = false;
-        //    blocker.style.display = '-webkit-box';
-        //    blocker.style.display = '-moz-box';
-        //    blocker.style.display = 'box';
-        //    instructions.style.display = '';
-        //  }
-        //}
+          if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element ) {
+            controls.enabled = true;
+            dat.GUI.toggleHide();
+            $("#pointer").fadeIn(1000);
+            controls.getObject().position.set(0,0,-1);
 
-       // var pointerlockerror = function ( event ) {
-       //   instructions.style.display = '';
-       // }
+
+
+            blocker.style.display = 'none';
+          } else {
+            controls.enabled = false;
+            blocker.style.display = '-webkit-box';
+            blocker.style.display = '-moz-box';
+            blocker.style.display = 'box';
+            instructions.style.display = '';
+          }
+        }
+
+        var pointerlockerror = function ( event ) {
+          instructions.style.display = '';
+        }
 
         // Hook pointer lock state change events
-       // document.addEventListener( 'pointerlockchange', pointerlockchange, false );
-       // document.addEventListener( 'mozpointerlockchange', pointerlockchange, false );
-       // document.addEventListener( 'webkitpointerlockchange', pointerlockchange, false );
+        document.addEventListener( 'pointerlockchange', pointerlockchange, false );
+        document.addEventListener( 'mozpointerlockchange', pointerlockchange, false );
+        document.addEventListener( 'webkitpointerlockchange', pointerlockchange, false );
 
-       // document.addEventListener( 'pointerlockerror', pointerlockerror, false );
-       // document.addEventListener( 'mozpointerlockerror', pointerlockerror, false );
-       // document.addEventListener( 'webkitpointerlockerror', pointerlockerror, false );
+        document.addEventListener( 'pointerlockerror', pointerlockerror, false );
+        document.addEventListener( 'mozpointerlockerror', pointerlockerror, false );
+        document.addEventListener( 'webkitpointerlockerror', pointerlockerror, false );
 
-       // instructions.addEventListener( 'click', function ( event ) {
-       //   instructions.style.display = 'none';
+        instructions.addEventListener( 'click', function ( event ) {
+          instructions.style.display = 'none';
 
           // Ask the browser to lock the pointer
-       //   element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
+          element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
 
-        //  if ( /Firefox/i.test( navigator.userAgent ) ) {
-        //    var fullscreenchange = function ( event ) {
+          if ( /Firefox/i.test( navigator.userAgent ) ) {
+            var fullscreenchange = function ( event ) {
 
-         //     if ( document.fullscreenElement === element || document.mozFullscreenElement === element || document.mozFullScreenElement === element ) {
-         //       document.removeEventListener( 'fullscreenchange', fullscreenchange );
-         //       document.removeEventListener( 'mozfullscreenchange', fullscreenchange );
-         //       element.requestPointerLock();
-         //     }
-         //   }
+              if ( document.fullscreenElement === element || document.mozFullscreenElement === element || document.mozFullScreenElement === element ) {
+                document.removeEventListener( 'fullscreenchange', fullscreenchange );
+                document.removeEventListener( 'mozfullscreenchange', fullscreenchange );
+                element.requestPointerLock();
+              }
+            }
 
-         //   document.addEventListener( 'fullscreenchange', fullscreenchange, false );
-         //   document.addEventListener( 'mozfullscreenchange', fullscreenchange, false );
+            document.addEventListener( 'fullscreenchange', fullscreenchange, false );
+            document.addEventListener( 'mozfullscreenchange', fullscreenchange, false );
 
-         //   element.requestFullscreen = element.requestFullscreen || element.mozRequestFullscreen || element.mozRequestFullScreen || element.webkitRequestFullscreen;
-         //   element.requestFullscreen();
+            element.requestFullscreen = element.requestFullscreen || element.mozRequestFullscreen || element.mozRequestFullScreen || element.webkitRequestFullscreen;
+            element.requestFullscreen();
 
-         // } else {
-         //   element.requestPointerLock();
-         // }
-        //}, false );
-      //} else {
-       // instructions.innerHTML = 'Your browser doesn\'t seem to support Pointer Lock API';
-     // }
+          } else {
+            element.requestPointerLock();
+          }
+        }, false );
+      } else {
+        instructions.innerHTML = 'Your browser doesn\'t seem to support Pointer Lock API';
+      }
+
+      
 
         init();
         animate();
@@ -186,7 +214,6 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
         //----------------------------------------------------------------------------------------------
         // UTILITY CODE - to start the render function and to call others methods
         //----------------------------------------------------------------------------------------------
-        var renderCamera = camera;
         var apartment = new THREE.Object3D();
 
 
@@ -221,9 +248,7 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
         // UTILITY METHODS - everything that helps you writing nice code
         //---------------------------------------------------------------------------------------------- 
 
-        projector = new THREE.Projector();
-        document.addEventListener('mousedown', onDocumentMouseDown, false);
-        objects = [];
+        
 
         //----------------------------------------------------------------------------------------------
         // UTILITY METHODS - everything that helps you writing nice code
@@ -263,10 +288,7 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
         mesh = new THREE.Mesh(obj.children[0].geometry, material);
 
         mesh.scale.set(10,10,10);
-        //mesh.position.set(-40,-20,0);
-
-          
-        //scene.add(mesh);
+       
 
       });
 
@@ -283,11 +305,14 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
 
         scene = new THREE.Scene();
         camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
-        camera.position.set(0,0,5);
-        //camera.up = new THREE.Vector3(1,0,0);
+        camera.position.set(0,2,5);
+
+        camera.up = new THREE.Vector3(0,1,0);
         //camera.down = new THREE.Vector3(-1,0,0);
         //camera.lookAt(new THREE.Vector3(3,0,2.95));
-        //controls = new THREE.PointerLockControls( camera );
+        controls = new THREE.PointerLockControls( camera );
+        scene.add( controls.getObject() );
+
 
 
         //var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
@@ -296,15 +321,21 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
 
 
         renderer = new THREE.WebGLRenderer();
-            //render.shadowMapEnabled = true;
 
         //----------------------------------------------------------------------------------------------
         // FP CONTROL
         //----------------------------------------------------------------------------------------------
-        //scene.add( controls.getObject() );
-
+          // initialize object to perform world/screen calculations
+        projector = new THREE.Projector();
+    
+        // when the mouse moves, call the given function
+        document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+    
         ray = new THREE.Raycaster();
-        ray.ray.direction.set( 0, -1, 0 );
+        var rayPointer = new THREE.Raycaster();
+        ray.ray.origin.copy(controls.getObject().position);
+        ray.ray.origin.z -= 4;
+        ray.ray.direction.set( 0, 0, -1);
 
 
         //----------------------------------------------------------------------------------------------
@@ -316,7 +347,7 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
         //----------------------------------------------------------------------------------------------
         // TRACKBALL SET UP
         //----------------------------------------------------------------------------------------------        
-         trackballControls = new THREE.TrackballControls(camera);
+         //trackballControls = new THREE.TrackballControls(camera);
 
 
         //----------------------------------------------------------------------------------------------
@@ -343,14 +374,24 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
         apartment.add(entranceFloor);
         apartment.add(entranceFloorLiving);
 
-        //scene.add(entranceFloor);
-        //scene.add(entranceFloorLiving);
+        
 
          //SKYBOX
-        var skyBoxGeometry = new THREE.CubeGeometry( 10000, 10000, 10000 );
-        var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x9999ff, side: THREE.BackSide } );
-        var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
-        scene.add(skyBox);
+        //SKYBOX TEXTURE
+        var directionsSky = ['Back','Front','Up','Down','Left', 'Right']
+        var texturesSky = ['TropicalSunnyDay','FullMoon']
+        var textureSky = 0;
+        var materialArray = [];
+        for (var i = 0; i < 6; i++)
+         materialArray.push(new THREE.MeshBasicMaterial({
+        map: THREE.ImageUtils.loadTexture('assets/textures/'+texturesSky[textureSky] + "/"+texturesSky[textureSky] + directionsSky[i] + "2048.png"),
+        side: THREE.BackSide
+    }));
+
+    var skybox_material = new THREE.MeshFaceMaterial(materialArray);
+    var skybox = new THREE.Mesh(new THREE.BoxGeometry(500, 500, 500), skybox_material);
+    skybox.color = new THREE.Color('#FFFFFF');
+    scene.add(skybox);
 
 
         //////////
@@ -393,11 +434,13 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
 
         bathWallW3Bottom.rotation.y = Math.PI*(3/2);
 
-        var bathWallW3Up = createBathFloor (5, 5, [60.49,79,27.5]);
+        var bathWallW3Up = createBathFloor (3, 5, [60.49,80,28.5]);
        
         bathWallW3Up.material.map.repeat.set(.25,.25);
 
         bathWallW3Up.rotation.y = Math.PI*(3/2);
+        bathWallW3Up.rotation.x = Math.PI/2;
+
 
 
         //General Wall
@@ -470,6 +513,13 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
 
         apartment.add(roomSxWall);
 
+        //Wall Corridoio in fondo
+        var corridoiWall = createLivingWall(30, 20, [13,118.99,15]);
+        corridoiWall.rotation.x = Math.PI/2;
+        corridoiWall.material.map.repeat.set(4,8);
+        apartment.add(corridoiWall);
+
+
 
         ///////////
         // DOORS //
@@ -477,7 +527,6 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
 
         //ENTRY DOOR
         var door = createEntryDoor (17, [3,13.7,14]);
-
 
         //First Room Door
         var roomDoor = createStandardDoor(10, [23.5,64.5,14]);
@@ -521,7 +570,6 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
         apartment.add(bathWallW3Bottom);
         apartment.add(bathWallW3Up);
         apartment.add(door);
-        objects.push(door);
 
         apartment.add(roomDoor);
         apartment.add(bathDoor);
@@ -592,7 +640,7 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
         /////////////
         // ROOM   //
         /////////////
-        var bed = createSingleBed([0, 30, 3]);
+        var bed = createSingleBed([43, 54, 3]);
         bed.rotation.y = Math.PI/2;
         apartment.add(bed);
 
@@ -638,40 +686,60 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
         chair.rotation.y = Math.PI;
         apartment.add(chair);
 
-        var lamp1 = createWallLamp ([4,30, 25]);
+         lamp1 = createWallLamp ([4,30, 25]);
         apartment.add(lamp1);
 
-        var lamp2 = createWallLamp ([4, 55,25]);
+         lamp2 = createWallLamp ([4, 55,25]);
         apartment.add(lamp2);
 
-        var lamp3 = createWallLamp ([4, 80, 25]);
+         lamp3 = createWallLamp ([4, 80, 25]);
         apartment.add(lamp3);
         
-        var lamp4 = createWallLamp ([4,105, 25]);
+         lamp4 = createWallLamp ([4,105, 25]);
         apartment.add(lamp4);
 
-        var lampadarioL = createLampadario([45,30,26]);
+        var lampadarioL = createLampadario([45,30,25]);
                 lampadarioL.scale.set(1,.7,1);
 
         apartment.add(lampadarioL);
 
-        var lampadarioR = createLampadario([45,60,26]);
+        var lampadarioR = createLampadario([45,60,25]);
                         lampadarioR.scale.set(1,.7,1);
 
         apartment.add(lampadarioR);
 
-        var lampadarioB = createLampadario([45,80,26]);
+        var lampadarioB = createLampadario([45,80,25]);
                         lampadarioB.scale.set(1,.7,1);
 
         apartment.add(lampadarioB);
 
-        var lampadarioBed = createLampadario([45,110,26]);
+        var lampadarioBed = createLampadario([45,110,25]);
                         lampadarioBed.scale.set(1,.7,1);
-
+        //var speaker = speaker([0,0,0]);
         apartment.add(lampadarioBed);
+        //apartment.add(speaker);
+
 
         apartment.rotation.x = -Math.PI/2;
 
+
+
+
+         objects.push(door);
+         objects.push(bedDoor);
+         objects.push(bathDoor);
+         objects.push(roomDoor);
+         objects.push(tv);
+         //objects.push(speaker);
+         objects.push(lamp1);
+         objects.push(lamp2);
+         objects.push(lamp3);
+         objects.push(lamp4);
+
+         objects.push(lampadarioB);
+         objects.push(lampadarioL);
+         objects.push(lampadarioR);
+         objects.push(lampadarioBed);
 
 
 
@@ -681,15 +749,18 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
 
 
         //----------------------------------------------------------------------------------------------
-        // CAMERAs SET UP  
+        // POINTER SET UP  
         //---------------------------------------------------------------------------------------------- 
-        //camera.position.set(-100,50,50);
-        //camera.up = new THREE.Vector3(0,0,1);
-        //camera.lookAt(new THREE.Vector3(40,30,2.95));
-
-        //camera.position.set(3,-10,3.3);
-        //camera.up = new THREE.Vector3(1,1,0);
-        //camera.lookAt(new THREE.Vector3(3,0,2.95));
+        var ballSprite;
+        //var ballTexture = THREE.ImageUtils.loadTexture( 'images/redball.png' );
+    
+            // suggested- alignment: THREE.SpriteAlignment.center  for targeting-style icon
+        //            alignment: THREE.SpriteAlignment.topLeft for cursor-pointer style icon
+        //var ballMaterial = new THREE.SpriteMaterial( { map: ballTexture, useScreenCoordinates: true, alignment: THREE.SpriteAlignment.center } );
+        //ballSprite = new THREE.Sprite( ballMaterial );
+        //ballSprite.scale.set( 32, 32, 1.0 );
+        //ballSprite.position.set( 50, 50, 0 );
+        //scene.add( ballSprite );
 
         
         //----------------------------------------------------------------------------------------------
@@ -701,8 +772,8 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
         var spotLight1 = new THREE.SpotLight(0xffffff);
         spotLight1.position.set(-30, 200, -100);
         spotLight1.intensity = .5;
-        //spotLight1.rotation.x = -Math.PI/2;
-        //scene.add(spotLight1);
+        spotLight1.rotation.x = -Math.PI/2;
+        scene.add(spotLight1);
 
         var spotLight2 = new THREE.SpotLight(0xffffff);
         spotLight2.position.set(30, 200, 100);
@@ -759,7 +830,6 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
         //----------------------------------------------------------------------------------------------
         // SET UP GUI CONTROL - to manage which include in the panel
         //---------------------------------------------------------------------------------------------- 
-        var gui = new dat.GUI();
         
 
 
@@ -805,20 +875,27 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
         // RENDER FUNCTION - to manage RENDERING,ANIMATIONS, UTILITIES ETC 
         //---------------------------------------------------------------------------------------------- 
         function animate() {
-          //stats.update();
-          trackballControls.update();
+          ////stats.update();
+          //trackballControls.update();
+          TWEEN.update();
+           KF.update();
+
+
 
           if (video.readyState === video.HAVE_ENOUGH_DATA) {
               if (texture) texture.needsUpdate = true;
           }
           requestAnimationFrame( animate );
-          //ray.ray.origin.copy( controls.getObject().position );
-          //ray.ray.origin.y -= 10;
+
+          ray.ray.origin.copy( controls.getObject().position );
+          ray.ray.origin.z -= 2;
           //var intersections = ray.intersectObjects( objects );
           //if ( intersections.length > 0 ) {
           //var distance = intersections[ 0 ].distance;
           
-        //controls.update();
+        controls.update();
+        //sound1.update( camera );
+
         renderer.render( scene, camera );
         }
 
@@ -843,30 +920,60 @@ This is the FINAL PROJECT of Cristoforo Parrotta/</a>
           return stats;
         }
 
-        function onDocumentMouseDown (event) {
-        //event.preventDefault();
-         mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-          mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+     
+
+function onDocumentMouseDown( event ) 
+{
+    // the following line would stop any other event handler from firing
+    // (such as the mouse's TrackballControls)
+    // event.preventDefault();
+    // update sprite position
+    //ballSprite.position.set( event.clientX, event.clientY, 0 );
+
+    console.log("Click.");
+    
+    // update the mouse variable
+    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
     
     // find intersections
 
     // create a Ray with origin at the mouse position
     //   and direction into the scene (camera direction)
-    var vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
-    projector.unprojectVector( vector, camera );
-    var ray = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+    //var vector = new THREE.Vector3(mouse.x, mouse.y, 1 );
+    var vector = new THREE.Vector3( 0, 0, 1 );
+    projector.unprojectVector(vector, camera);
+    var raycaster = new THREE.Raycaster(vector,controls.getDirection(new THREE.Vector3(0, 0, -1)).clone());
 
+    //var vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
+    //projector.unprojectVector( vector, camera );
+    //ray = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+    
+    
+
+       
     // create an array containing all objects in the scene with which the ray intersects
-    var intersects = ray.intersectObjects( objects );
+    var intersects = ray.intersectObjects( objects, true );
+
     
     // if there is one (or more) intersections
     if ( intersects.length > 0 )
-    {
+    { 
         console.log("Hit @ " + toString( intersects[0].point ) );
         // change the color of the closest face.
         intersects[0].object.interact && intersects[0].object.interact();
-    }
-
+         if ((typeof intersects[0].object.prototype ===  typeof objects[0].prototype) ){
+           if (i){
+            lamp1.children[0].interact();
+            lamp2.children[0].interact();
+            lamp3.children[0].interact();
+            lamp4.children[0].interact();
+            }
+             i = false;              }
+        //intersects[ 0 ].face.color.setRGB( 0.8 * Math.random() + 0.2, 0, 0 ); 
+        //intersects[ 0 ].object.geometry.colorsNeedUpdate = true;
+    //i==1;}
+}
 }
         
         

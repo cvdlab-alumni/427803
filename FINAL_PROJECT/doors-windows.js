@@ -1,19 +1,4 @@
-     //function createMesh(geom, imageFile, bump, scale) {
-       //     var texture = THREE.ImageUtils.loadTexture("assets/textures/general/" + imageFile)
-       //     geom.computeVertexNormals();
-       //     var mat = new THREE.MeshPhongMaterial();
-       //     mat.map = texture;
 
-       //     if (bump&&scale) {
-       //       var bump = THREE.ImageUtils.loadTexture("assets/textures/general/" + bump)
-       //       mat.bumpMap = bump;
-       //       mat.bumpScale = scale;
-       //     }
-
-       //     var mesh = new THREE.Mesh(geom, mat);
-
-       //     return mesh;
-     // }
       function createMesh(geometry,image,bump, scale) {
     if(bump)
         material = mkTextureMaterialBump(image,bump, scale);   
@@ -103,33 +88,25 @@ function mkTextureMaterialBump(image,bump, scale) {
             door.add(doorB);
             door.position.x = 8.5;
 
-            var joint = new THREE.Object3D;
+            var joint = new THREE.Object3D();
 
-            joint.add(door);
             joint.position.set(position[0],position[1],position[2]);
+            joint.add(door);
+
 
             door.interact = function(){
                if(!isClosed){
-                       if (reverse===1){
                                new TWEEN.Tween(joint.rotation)
-                               .to({z: -Math.PI/2},1000)
+                               .to({z: 0},1000)
                                .start();
+                               isClosed =true;
                        } else {
                                new TWEEN.Tween(joint.rotation)
                                .to({z: Math.PI/2},1000)
                                .start();
+                               isClosed=false;
                        }
                        
-                       isClosed=true;
-               } else {
-                       new TWEEN.Tween(joint.rotation)
-                       .to({z: 0},1000)
-                       .start();
-                       isClosed=false;
-               }
-
-
-
  }
              return joint;
 
@@ -137,6 +114,8 @@ function mkTextureMaterialBump(image,bump, scale) {
 
 
  function createStandardDoor (weight, position){
+            var isClosed = false;
+
             var doorGeometry = new THREE.BoxGeometry(weight,22,0.9);
             var doorGeometryB = new THREE.BoxGeometry(weight, 22, 0.1);
            
@@ -153,13 +132,26 @@ function mkTextureMaterialBump(image,bump, scale) {
             door.add(doorB);
             door.position.x = 5;
 
-            var joint = new THREE.Object3D;
-
-            joint.add(door);
+            var joint = new THREE.Object3D();
             joint.position.set(position[0],position[1],position[2]);
 
-
-            return joint;
+            joint.add(door);
+             door.interact = function(){
+               if(!isClosed){
+                               new TWEEN.Tween(joint.rotation)
+                               .to({z: 0},1000)
+                               .start();
+                               isClosed =true;
+                       } else {
+                               new TWEEN.Tween(joint.rotation)
+                               .to({z: -Math.PI/2},1000)
+                               .start();
+                               
+                               isClosed=false;
+                       }
+                       
+ }
+             return joint;
 
  }
 
